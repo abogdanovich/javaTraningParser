@@ -28,13 +28,8 @@ import org.apache.logging.log4j.Logger;
  *
  */
 public class Main {
-	String fileName;
 	static final Logger log = LogManager.getLogger(Main.class);
-	
-	Main(String fileName) {
-		this.fileName = fileName;
-	}
-	
+
 	/**
 	 * generate action file with appropriate data
 	 * @param actionName
@@ -44,7 +39,7 @@ public class Main {
 	public void generateActionFile(String actionName, ArrayList<String> params) throws IOException {
 		String data = new String();
 		
-		data = 
+		data =
 			"/**\r\n" +
 			"* "+actionName+" class with appropriate KB old actions\r\n"  +
 			"* @author bogdanovich_a\r\n" +
@@ -176,10 +171,9 @@ public class Main {
 		data += "\r\n }";
 		
 		//write data into file
-		this.saveClassFile(actionName, data);
+		saveClassFile(actionName, data);
 	}
-	
-	
+
 	/**
 	 * save data into Class file 
 	 * @param fileName
@@ -197,97 +191,56 @@ public class Main {
 			log.info(String.format("Class %s file saved", fileName));
 		}
 	}
-	
+
 	/**
-	 * parse XML file and return all actions with params and values
-	 * @param xmlNodeName
-	 * @return
+	 * xml recursion parser
+	 * @param node
+	 * @param actionList
+	 * @param paramList
+	 * @throws Exception
 	 */
-	public void parseActions(String xmlNodeName) {
-		try {
-			/* parse XML file structure */
-			File xmlFile = new File(this.fileName);
-			ArrayList<String> actionList = new ArrayList<String>();
+	public void parseKBActions(Node node, ArrayList<String> actionList, ArrayList<String> paramList) throws Exception {
+		NodeList list = node.getChildNodes();
+		for (int i = 0; i < list.getLength(); i++) {
+			Node childNode = list.item(i);
+			String nodeText = childNode.getTextContent();
+			String nodeName = childNode.getNodeName();
 
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(xmlFile);
-			doc.getDocumentElement().normalize();
+			switch (nodeName) {
+				case "scenarioName":
+					log.info(String.format("Test Case: [%s]", nodeText));
+					break;
+				case "keyBlockGroupName":
+					log.info(String.format("Test Case STEP: [%s]", nodeText));
+					if (!actionList.isEmpty()) {
+						log.info(String.format("actionList = %s", actionList));
+						actionList.clear();
+					}
+					break;
+				case "keyBlockName":
+					// cleanup params list
+					log.info(String.format("STEP ACTION: [%s]", nodeText));
+					// check if that action is not in the list
+					if (!nodeText.equals("")) {
+						actionList.add(nodeText);
+						generateActionFile(nodeText, paramList);
+						// just to be sure that params are not copied
+						paramList.clear();
+					}
+					break;
+				case "keyBlockParams":
+					Element element = (Element) childNode;
 
-			// get KeyBlockScenario
-			NodeList scenarios = doc.getElementsByTagName(xmlNodeName); 
-			
-			for (int i = 0; i < scenarios.getLength(); i++ ) {
-				// get the list of child like> scenarioName and etc....
-				NodeList testCase = scenarios.item(i).getChildNodes();
-				
-				// iterate child items
-				for (int j = 0; j < testCase.getLength(); j++) {
-					Node testCaseName = testCase.item(j);
-					
-					if (testCaseName.getNodeType() == Node.ELEMENT_NODE) {
-						if (testCaseName.getNodeName().equals("scenarioName")) {
-							// test case name from old KB system
-							//log.debug(" TEST CASE :" + testCaseName.getTextContent());
-						}
-
-						// review each child
-						NodeList steps = testCaseName.getChildNodes();
-						
-						for (int k = 0; k < steps.getLength(); k++) {
-							if (steps.item(k).getNodeType() == Node.ELEMENT_NODE) {
-								//node with elements 
-								NodeList step = steps.item(k).getChildNodes();
-								
-									for (int p = 0; p < step.getLength(); p++) {
-										//take here step name keyBlockGroupName
-										NodeList stepName = step.item(p).getChildNodes();
-										if (step.item(p).getNodeName().equals("keyBlockGroupName")) {
-											// test case step
-											//log.debug("STEP : " + step.item(p).getTextContent());
-										}
-										
-										for (int st = 0; st < stepName.getLength(); st++) {
-											ArrayList<String> paramList = new ArrayList<String>();
-											String actionName = new String();
-											
-											if (stepName.item(st).getNodeType() == Node.ELEMENT_NODE) {
-												NodeList params = stepName.item(st).getChildNodes();
-												
-													for (int pst = 0; pst < params.getLength(); pst++) {
-														if (params.item(pst).getNodeName().equals("keyBlockName")) {
-															// action from the XML file
-															//log.debug("ACTION : " + params.item(pst).getTextContent());
-															actionName = params.item(pst).getTextContent();
-														} 
-														
-														if (params.item(pst).getNodeName().equals("keyBlockParams")) {
-															Element element = (Element) params.item(pst);
-															
-															for (int elparam = 0; elparam < element.getElementsByTagName("paramName").getLength(); elparam++) {
-																//log.info("PARAM : " + element.getElementsByTagName("paramName").item(elparam).getTextContent()
-																//		+ " value: " + element.getElementsByTagName("paramValue").item(elparam).getTextContent());
-																paramList.add(element.getElementsByTagName("paramName").item(elparam).getTextContent());
-															} //end of action element
-														
-														} //end for if
-
-														if (!actionName.equals("") && !paramList.isEmpty() && !actionList.contains(actionName)) {
-															actionList.add(actionName);
-															//log.info(String.format("actionName : %s and paramList %s", actionName, paramList));
-															this.generateActionFile(actionName, paramList);
-														}
-													} //end for if
-											} 
-										} //end for step
-									} // end of for
-							} 
-						} // end of for steps
-					} //end of test case
-				}
+					for (int k = 0; k < element.getElementsByTagName("paramName").getLength(); k++) {
+						// add a new param name
+						paramList.add(element.getElementsByTagName("paramName").item(k).getTextContent());
+					}
+					if (!paramList.isEmpty()) {
+						log.info(String.format("paramList = %s", paramList));
+					}
+					break;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			parseKBActions(childNode, actionList, paramList);
 		}
 	}
 
@@ -296,16 +249,23 @@ public class Main {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
-		String nodeName = "KeyBlockScenario";
+	public static void main(String[] args) throws Exception {
 		String fileName = "PCRF_Basic.xml";
+		ArrayList<String> actionList = new ArrayList<String>();
+		ArrayList<String> paramList = new ArrayList<String>();
 
-		Main xmlParser = new Main(fileName);
+		Main xmlParser = new Main();
 		
-		log.info("Converter is started to look for: " + nodeName + "node name");
+		log.info("Converter is started");
 		log.info("Input XML file is : " + fileName);
 		log.info("Get started with parseActions");
-		
-		xmlParser.parseActions(nodeName);
+
+		File xmlFile = new File(fileName);
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(xmlFile);
+
+		// recursion node review
+		xmlParser.parseKBActions(doc, actionList, paramList);
 	}
 }

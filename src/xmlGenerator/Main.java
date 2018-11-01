@@ -183,6 +183,52 @@ public class Main {
 		}
 	}
 
+//    public void parseKBActions(Node node, ArrayList<String> actionList, ArrayList<String> paramList) throws Exception {
+//        NodeList list = node.getChildNodes();
+//        for (int i = 0; i < list.getLength(); i++) {
+//            Node childNode = list.item(i);
+//            String nodeText = childNode.getTextContent();
+//            String nodeName = childNode.getNodeName();
+//
+//            switch (nodeName) {
+//                case "scenarioName":
+//                    log.info(String.format("Test Case: [%s]", nodeText));
+//                    break;
+//                case "keyBlockGroupName":
+//                    log.info(String.format("Test Case STEP: [%s]", nodeText));
+//                    if (!actionList.isEmpty()) {
+//                        log.info(String.format("actionList = %s", actionList));
+//                        actionList.clear();
+//                    }
+//                    break;
+//                case "keyBlockName":
+//                    // cleanup params list
+//
+//                    log.info(String.format("STEP ACTION: [%s]", nodeText));
+//                    // check if that action is not in the list
+//                    if (!nodeText.equals("")) {
+//                        actionList.add(nodeText);
+//                        generateActionFile(nodeText, paramList);
+//                        // just to be sure that params are not copied
+//                        paramList.clear();
+//                    }
+//                    break;
+//                case "keyBlockParams":
+//                    Element element = (Element) childNode;
+//
+//                    for (int k = 0; k < element.getElementsByTagName("paramName").getLength(); k++) {
+//                        // add a new param name
+//                        paramList.add(element.getElementsByTagName("paramName").item(k).getTextContent());
+//                    }
+//                    if (!paramList.isEmpty()) {
+//                        log.info(String.format("paramList = %s", paramList));
+//                    }
+//                    break;
+//            }
+//            parseKBActions(childNode, actionList, paramList);
+//        }
+//    }
+
 	/**
 	 * parse XML file and return all actions with params and values
 	 * @param xmlNodeName
