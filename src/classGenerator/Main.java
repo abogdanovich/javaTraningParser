@@ -6,10 +6,7 @@
  */
 package classGenerator;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +31,8 @@ public class Main {
 	static final Logger log = LogManager.getLogger(Main.class);
 	static final String packageFileName = "preferences.xml";
 	static final String xmlFileName = "PCRF_Basic.xml";
+//	static final String xmlFileName = "PCRF_Other.xml";
+
 	ArrayList<String> actionList = new ArrayList<String>();
 	ArrayList<String> paramList = new ArrayList<String>();
 	String actionName = "";
@@ -86,6 +85,8 @@ public class Main {
 	 */
 	public Document getParserObject(String fileName) throws Exception {
 		File xmlFile = new File(fileName);
+//		InputStream xmlFile       = new FileInputStream(fileName);
+//		Reader      inputStreamReader = new InputStreamReader(xmlFile, "UTF-8");
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document xmlDocument = dBuilder.parse(xmlFile);
@@ -103,14 +104,21 @@ public class Main {
 		String data = new String();
 		String actionNameOriginal = actionName;
 		String packagePath = "";
+		String testMethodName = "";
 		final String SUFFIX = "_withParser";
 
 		/* The list of Actions from @Rabi -> that should be translated to "_withParser" suffix.
 		* Feel free to add a new Actions names into that list
 		*/
 
-		List<String> suffixActionRequired = asList("Acstat", "CheckActiveSub", "CheckSubSessions",
+		List<String> suffixActionRequired = asList("Acstat", "CheckActiveSubs", "CheckSubSessions",
 				"CheckNoOfConnections", "Acmon");
+
+		if (suffixActionRequired.contains(actionName)) {
+			testMethodName = actionName + SUFFIX;
+		} else {
+			testMethodName = actionName;
+		}
 
 		// get node package path (eg: folder structure) -> and put packagePath
 		Document xmlHierarchyDocument = getParserObject(packageFileName);
@@ -122,10 +130,6 @@ public class Main {
 		// remove the last "." symbol
 		if (!packagePath.equals("")) {
 			packagePath = packagePath.substring(0, packagePath.length() - 1);
-		}
-
-		if (suffixActionRequired.contains(actionName)) {
-			actionName = actionName + SUFFIX;
 		}
 
 		data =
@@ -188,11 +192,11 @@ public class Main {
 				data += String.format("\"%s\", ", params.get(i));
 			}
 		}
-		
-		data += 
+
+		data +=
 			"})\r\n" +
 			"\t @Test\r\n" +
-			"\t public void "+actionName+"_KB() {\r\n" +
+			"\t public void " + actionName + "_KB() {\r\n" +
 			"\r\n" +
 			"\t\t // prepare parameters\r\n" +
 			"\t\t List<KBParam> params = new ArrayList<>();\r\n";
@@ -206,9 +210,9 @@ public class Main {
 		data += 
 		"\r\n" + 
 		"\t\t // execute KB action\r\n" +
-		"\t\t automation.allot.com.Actions.KBsystem.QaAutomation." + packagePath + "." + actionName + " " + actionName.toLowerCase() +
+		"\t\t automation.allot.com.Actions.KBsystem.QaAutomation." + packagePath + "." + testMethodName + " " + actionName.toLowerCase() +
 				" =  new automation.allot.com.Actions.KBsystem.QaAutomation."
-				+ packagePath + "." + actionName +"(\"\", params);\r\n" +
+				+ packagePath + "." + testMethodName +"(\"\", params);\r\n" +
 		"\t\t "+actionName.toLowerCase()+".run();\r\n" + 
 		"\r\n" + 
 		"\t\t if ("+actionName.toLowerCase()+".success() == true) {\r\n" + 
@@ -324,21 +328,13 @@ public class Main {
 
 					}
 					break;
-
 				case "KeyBlock":
 					// generate class file
 					if (!paramList.isEmpty() && !actionName.equals("")) {
-						log.info("---------");
-						log.info(String.format("paramList >>>>> %s", paramList));
-						log.info(String.format("actionName >>>>> %s", actionName));
 						generateActionFile(actionName, paramList);
 						paramList.clear();
-						log.info("---------");
 					}
-
 			}
-
-
 			parseKBActions(childNode);
 		}
 	}
