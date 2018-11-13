@@ -1,7 +1,7 @@
 /**
- * this script allow to extract 
- * all actions from old KB system and
- * save them into class files
+ * this script allow to extract all actions from old KB system and
+ * save them into class files with specific folder structure
+ * log4j 2 is used to log actions into <logs/smp.log>
  * @author bogdanovich_a
  */
 package classGenerator;
@@ -17,10 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import static java.util.Arrays.asList;
 
@@ -33,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 /**
  *
  * @author bogdanovich_a
- *
  */
 public class Main {
 	static final Logger log = LogManager.getLogger(Main.class);
@@ -82,7 +77,22 @@ public class Main {
 	}
 
 	/**
-	 * generate action file with appropriate data
+	 * get document object for XML parsing
+	 * @param fileName
+	 * @return
+	 * @throws Exception
+	 */
+	public Document getParserObject(String fileName) throws Exception {
+		File xmlFile = new File(fileName);
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document xmlDocument = dBuilder.parse(xmlFile);
+
+		return xmlDocument;
+	}
+
+	/**
+	 * generate action file with appropriate data and folder structure
 	 * @param actionName
 	 * @param params
 	 * @throws IOException
@@ -92,27 +102,28 @@ public class Main {
 		String packagePath = "";
 		final String SUFFIX = "_withParser";
 
-		// the list of Actions from @Rabi -> that should be translated to "_withParser" suffix.
+		/* The list of Actions from @Rabi -> that should be translated to "_withParser" suffix.
+		* Feel free to add a new Actions names into that list
+		*/
+
 		List<String> suffixActionRequired = asList("Acstat", "CheckActiveSub", "CheckSubSessions",
 				"CheckNoOfConnections", "Acmon");
-		if (suffixActionRequired.contains(actionName)) {
-			actionName = actionName + SUFFIX;
-		}
 
 		// get node package path (eg: folder structure) -> and put packagePath
-		File xmlFile = new File(packageFileName);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(xmlFile);
-
+		Document xmlHierarchyDocument = getParserObject(packageFileName);
 		// take the correct path for KB actions from preferences.xml
-		getPackageName(doc, actionName);
-
+		getPackageName(xmlHierarchyDocument, actionName);
 		// convert </> folder path into package path
 		packagePath = folderPath.replace("/", ".");
 
 		// remove the last "." symbol
-		packagePath = packagePath.substring(0, packagePath.length() - 1);
+		if (!packagePath.equals("")) {
+			packagePath = packagePath.substring(0, packagePath.length() - 1);
+		}
+
+		if (suffixActionRequired.contains(actionName)) {
+			actionName = actionName + SUFFIX;
+		}
 
 		data =
 			"/**\r\n" +
@@ -192,9 +203,9 @@ public class Main {
 		data += 
 		"\r\n" + 
 		"\t\t // execute KB action\r\n" +
-		"\t\t automation.allot.com.Actions.KBsystem.QaAutomation." + packagePath + actionName + " " + actionName.toLowerCase() +
+		"\t\t automation.allot.com.Actions.KBsystem.QaAutomation." + packagePath + "." + actionName + " " + actionName.toLowerCase() +
 				" =  new automation.allot.com.Actions.KBsystem.QaAutomation."
-				+ packagePath + actionName +"(\"\", params);\r\n" +
+				+ packagePath + "." + actionName +"(\"\", params);\r\n" +
 		"\t\t "+actionName.toLowerCase()+".run();\r\n" + 
 		"\r\n" + 
 		"\t\t if ("+actionName.toLowerCase()+".success() == true) {\r\n" + 
@@ -251,7 +262,6 @@ public class Main {
 	 */
 	public void saveClassFile(String fileName, String data) throws IOException {
 		try {
-
 			// save into folder packagePath NIO
 			folderPath = "output\\" + folderPath;
 			Path dirPath = Paths.get(folderPath);
@@ -260,14 +270,11 @@ public class Main {
 				Files.createDirectories(dirPath);
 				log.debug(String.format("Folder: %s was created successfully", folderPath));
 			}
-
 			// next is to write file into this directory
 			FileWriter fw = new FileWriter(folderPath + "\\" + fileName + ".java");
 			BufferedWriter WriteFileBuffer = new BufferedWriter(fw);
 			WriteFileBuffer.write(data);
 			WriteFileBuffer.close();
-
-			
 		} finally {
 			folderPath = "";
 			log.info(String.format("Class %s file saved", fileName));
@@ -313,7 +320,6 @@ public class Main {
 					break;
 				case "keyBlockParams":
 					Element element = (Element) childNode;
-
 					for (int k = 0; k < element.getElementsByTagName("paramName").getLength(); k++) {
 						// add a new param name
 						paramList.add(element.getElementsByTagName("paramName").item(k).getTextContent());
@@ -343,12 +349,9 @@ public class Main {
 		log.info("Input XML file is : " + xmlFileName);
 		log.info("Get started with parseActions");
 
-		File xmlFile = new File(xmlFileName);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(xmlFile);
+		Document xmlActionsDocument = xmlParser.getParserObject(xmlFileName);
 
 		// recursion node review
-		xmlParser.parseKBActions(doc, actionList, paramList);
+		xmlParser.parseKBActions(xmlActionsDocument, actionList, paramList);
 	}
 }
