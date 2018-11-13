@@ -99,6 +99,7 @@ public class Main {
 	 */
 	public void generateActionFile(String actionName, ArrayList<String> params) throws Exception {
 		String data = new String();
+		String actionNameOriginal = actionName;
 		String packagePath = "";
 		final String SUFFIX = "_withParser";
 
@@ -152,7 +153,7 @@ public class Main {
 
 		// put here all action params !
 		for (int i=0; i < params.size(); i++) {
-			data += String.format("\t private String %s = \"\"; \r\n ", params.get(i).toLowerCase());
+			data += String.format("\t private String %s = \"\"; \r\n ", params.get(i));
 		};
 
 		data +=
@@ -174,7 +175,7 @@ public class Main {
 			"\t /**\r\n" +
 			"\t * KB System action: "+actionName+" \r\n" +
 			"\t */\r\n" +
-			"\t @TestProperties(ParamsInclude = {";
+			"\t @TestProperties(paramsInclude = {";
 
 		// put here all action params !
 		for (int i=0; i < params.size(); i++) {
@@ -251,7 +252,7 @@ public class Main {
 		data += "\r\n }";
 		
 		//write data into file
-		saveClassFile(actionName, data);
+		saveClassFile(actionNameOriginal, data);
 	}
 
 	/**
