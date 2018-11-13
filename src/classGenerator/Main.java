@@ -34,7 +34,9 @@ public class Main {
 	static final Logger log = LogManager.getLogger(Main.class);
 	static final String packageFileName = "preferences.xml";
 	static final String xmlFileName = "PCRF_Basic.xml";
-
+	ArrayList<String> actionList = new ArrayList<String>();
+	ArrayList<String> paramList = new ArrayList<String>();
+	String actionName = "";
 	String folderPath = "";
 
 	/**
@@ -133,8 +135,6 @@ public class Main {
 			"*/\r\n" +
 			"package automation.allot.com.Actions.KBsystem.jsystemActions." + packagePath + ";\r\n" +
 			"\r\n" +
-			"import static org.junit.Assert.*;\r\n" +
-			"\r\n" +
 			"import java.util.ArrayList;\r\n" +
 			"import java.util.List;\r\n" +
 			"\r\n" +
@@ -150,6 +150,8 @@ public class Main {
 			"public class " + actionName + " extends SystemTestCase4 {\r\n" +
 			"\r\n" +
 			"\t // class variables for the given Action\r\n";
+
+		//log.debug(String.format("PARAMS >>>> %s ", params));
 
 		// put here all action params !
 		for (int i=0; i < params.size(); i++) {
@@ -210,9 +212,9 @@ public class Main {
 		"\t\t "+actionName.toLowerCase()+".run();\r\n" + 
 		"\r\n" + 
 		"\t\t if ("+actionName.toLowerCase()+".success() == true) {\r\n" + 
-		"\t\t\t report.report(\"SUCCESS\", report.PASS);\r\n" + 
+		"\t\t\t report.report(\"KeyBlock Action SUCCESS\", report.PASS);\r\n" +
 		"\t\t } else {\r\n" + 
-		"\t\t\treport.report(\"FAILES\", report.FAIL);\r\n" + 
+		"\t\t\treport.report(\"KeyBlock Action FAILED\", report.FAIL);\r\n" +
 		"\t\t }\r\n" + 
 		"\t } \r\n" + 
 		"\r\n" + 
@@ -289,7 +291,7 @@ public class Main {
 	 * @param paramList
 	 * @throws Exception
 	 */
-	public void parseKBActions(Node node, ArrayList<String> actionList, ArrayList<String> paramList) throws Exception {
+	public void parseKBActions(Node node) throws Exception {
 		NodeList list = node.getChildNodes();
 		for (int i = 0; i < list.getLength(); i++) {
 			Node childNode = list.item(i);
@@ -308,29 +310,36 @@ public class Main {
 					}
 					break;
 				case "keyBlockName":
-					// cleanup params list
-					log.info(String.format("STEP ACTION: [%s]", nodeText));
-
+					actionName = childNode.getTextContent();
 					// check if that action is not in the list
-					if (!nodeText.equals("")) {
-						actionList.add(nodeText);
-						generateActionFile(nodeText, paramList);
-						// just to be sure that params are not copied
-						paramList.clear();
+					if (!actionName.equals("")) {
+						actionList.add(actionName);
 					}
 					break;
-				case "keyBlockParams":
+				case "KeyBlockParam":
 					Element element = (Element) childNode;
 					for (int k = 0; k < element.getElementsByTagName("paramName").getLength(); k++) {
 						// add a new param name
 						paramList.add(element.getElementsByTagName("paramName").item(k).getTextContent());
-					}
-					if (!paramList.isEmpty()) {
-						log.info(String.format("paramList = %s", paramList));
+
 					}
 					break;
+
+				case "KeyBlock":
+					// generate class file
+					if (!paramList.isEmpty() && !actionName.equals("")) {
+						log.info("---------");
+						log.info(String.format("paramList >>>>> %s", paramList));
+						log.info(String.format("actionName >>>>> %s", actionName));
+						generateActionFile(actionName, paramList);
+						paramList.clear();
+						log.info("---------");
+					}
+
 			}
-			parseKBActions(childNode, actionList, paramList);
+
+
+			parseKBActions(childNode);
 		}
 	}
 
@@ -340,10 +349,6 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws Exception {
-
-		ArrayList<String> actionList = new ArrayList<String>();
-		ArrayList<String> paramList = new ArrayList<String>();
-
 		Main xmlParser = new Main();
 		
 		log.info("Converter is started");
@@ -353,6 +358,6 @@ public class Main {
 		Document xmlActionsDocument = xmlParser.getParserObject(xmlFileName);
 
 		// recursion node review
-		xmlParser.parseKBActions(xmlActionsDocument, actionList, paramList);
+		xmlParser.parseKBActions(xmlActionsDocument);
 	}
 }
