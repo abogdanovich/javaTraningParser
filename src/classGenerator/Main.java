@@ -7,9 +7,7 @@
 package classGenerator;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,13 +28,13 @@ import org.apache.logging.log4j.Logger;
 public class Main {
 	static final Logger log = LogManager.getLogger(Main.class);
 	static final String packageFileName = "preferences.xml";
-	static final String xmlFileName = "PCRF_Basic.xml";
-//	static final String xmlFileName = "PCRF_Other.xml";
-
+	static final String xmlKBFiles = "d:\\allot\\oldKB\\trunk\\SW\\bin\\res\\xml\\";
+	static final String xmlKBActions = "smp_actions.txt";
 	ArrayList<String> actionList = new ArrayList<String>();
 	ArrayList<String> paramList = new ArrayList<String>();
 	String actionName = "";
 	String folderPath = "";
+	String packagePath = "";
 
 	/**
 	 * Method that takes package path from <preferences.xml> KB file
@@ -45,7 +43,6 @@ public class Main {
 	 * @throws Exception
 	 */
 	public void getPackageName(Node node, String actionName) throws Exception {
-
 		NodeList list = node.getChildNodes();
 
 		for (int i = 0; i < list.getLength(); i++) {
@@ -70,6 +67,7 @@ public class Main {
 								folderPath += childNode.getParentNode().getNodeName() + "/";
 							}
 							folderPath = folderPath.replace("#document/", "");
+							break;
 						}
 				}
 				getPackageName(childNode, actionName);
@@ -85,8 +83,6 @@ public class Main {
 	 */
 	public Document getParserObject(String fileName) throws Exception {
 		File xmlFile = new File(fileName);
-//		InputStream xmlFile       = new FileInputStream(fileName);
-//		Reader      inputStreamReader = new InputStreamReader(xmlFile, "UTF-8");
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document xmlDocument = dBuilder.parse(xmlFile);
@@ -103,7 +99,6 @@ public class Main {
 	public void generateActionFile(String actionName, ArrayList<String> params) throws Exception {
 		String data = new String();
 		String actionNameOriginal = actionName;
-		String packagePath = "";
 		String testMethodName = "";
 		final String SUFFIX = "_withParser";
 
@@ -125,10 +120,10 @@ public class Main {
 		// take the correct path for KB actions from preferences.xml
 		getPackageName(xmlHierarchyDocument, actionName);
 		// convert </> folder path into package path
-		packagePath = folderPath.replace("/", ".");
 
 		// remove the last "." symbol
-		if (!packagePath.equals("")) {
+		if (!folderPath.equals("")) {
+			packagePath = folderPath.replace("/", ".");
 			packagePath = packagePath.substring(0, packagePath.length() - 1);
 		}
 
@@ -256,7 +251,7 @@ public class Main {
 		}
 
 		data += "\r\n }";
-		
+
 		//write data into file
 		saveClassFile(actionNameOriginal, data);
 	}
@@ -284,6 +279,7 @@ public class Main {
 			WriteFileBuffer.close();
 		} finally {
 			folderPath = "";
+			packagePath = "";
 			log.info(String.format("Class %s file saved", fileName));
 		}
 	}
@@ -291,28 +287,17 @@ public class Main {
 	/**
 	 * xml recursion parser
 	 * @param node
-	 * @param actionList
-	 * @param paramList
 	 * @throws Exception
 	 */
 	public void parseKBActions(Node node) throws Exception {
 		NodeList list = node.getChildNodes();
+
 		for (int i = 0; i < list.getLength(); i++) {
 			Node childNode = list.item(i);
 			String nodeText = childNode.getTextContent();
 			String nodeName = childNode.getNodeName();
 
 			switch (nodeName) {
-				case "scenarioName":
-					log.info(String.format("Test Case: [%s]", nodeText));
-					break;
-				case "keyBlockGroupName":
-					log.info(String.format("Test Case STEP: [%s]", nodeText));
-					if (!actionList.isEmpty()) {
-						log.info(String.format("actionList = %s", actionList));
-						actionList.clear();
-					}
-					break;
 				case "keyBlockName":
 					actionName = childNode.getTextContent();
 					// check if that action is not in the list
@@ -325,10 +310,9 @@ public class Main {
 					for (int k = 0; k < element.getElementsByTagName("paramName").getLength(); k++) {
 						// add a new param name
 						paramList.add(element.getElementsByTagName("paramName").item(k).getTextContent());
-
 					}
 					break;
-				case "KeyBlock":
+				case "keyBlockRepeatCount":
 					// generate class file
 					if (!paramList.isEmpty() && !actionName.equals("")) {
 						generateActionFile(actionName, paramList);
@@ -344,16 +328,23 @@ public class Main {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception, DirectoryIteratorException {
 		Main xmlParser = new Main();
 		
 		log.info("Converter is started");
-		log.info("Input XML file is : " + xmlFileName);
 		log.info("Get started with parseActions");
 
-		Document xmlActionsDocument = xmlParser.getParserObject(xmlFileName);
-
-		// recursion node review
-		xmlParser.parseKBActions(xmlActionsDocument);
+		//get the list of xml files and pass one by one into cycle
+		try (BufferedReader br = new BufferedReader(new FileReader(xmlKBActions))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				log.info("Input XML file is : " + line);
+				Document xmlActionsDocument = xmlParser.getParserObject(xmlKBFiles+line+".xml");
+				// recursion node review
+				xmlParser.parseKBActions(xmlActionsDocument);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
