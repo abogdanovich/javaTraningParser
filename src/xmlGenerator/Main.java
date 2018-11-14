@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -24,13 +25,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import static java.util.Arrays.asList;
+
 /**
  * @author bogdanovich_a
  *
  */
 public class Main {
-	
-	String fileName = "";
+	String uuidStep = "";
+	String uuidTestCase = "";
+    String packagePath = "";
+    String folderPath = "";
 	String actionName = "";
 	ArrayList<String> actionList = new ArrayList<String>();
 	ArrayList<String> paramList = new ArrayList<String>();
@@ -55,7 +60,47 @@ public class Main {
 			"\t<taskdef classname=\"com.aqua.anttask.jsystem.JSystemSetAntProperties\" name=\"jsystemsetantproperties\"/>\r\n" +
 			"\t<target name=\"execute scenario\">\n";
 
-	/**
+
+    /**
+     * Method that takes package path from <preferences.xml> KB file
+     * @param node
+     * @param actionName
+     * @throws Exception
+     */
+    public void getPackageName(Node node, String actionName) throws Exception {
+        NodeList list = node.getChildNodes();
+
+        for (int i = 0; i < list.getLength(); i++) {
+            Node childNode = list.item(i);
+            String nodeText = childNode.getTextContent();
+            String nodeName = childNode.getNodeName();
+            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                switch (nodeName) {
+                    case "class":
+                        if (nodeText.equals(actionName)) {
+                            // FIXME: make algorithm more reliable without hardcode for xml levels
+                            if (!childNode.getParentNode().getParentNode().getParentNode().getNodeName().equals("layout")) {
+                                folderPath += childNode.getParentNode().getParentNode().getParentNode().getNodeName() + "/";
+                            }
+
+                            if (!childNode.getParentNode().getParentNode().getNodeName().equals("layout")) {
+                                folderPath += childNode.getParentNode().getParentNode().getNodeName() + "/";
+                            }
+
+                            if (!childNode.getParentNode().getNodeName().equals("layout")) {
+                                folderPath += childNode.getParentNode().getNodeName() + "/";
+                            }
+                            folderPath = folderPath.replace("#document/", "");
+                            break;
+                        }
+                }
+                getPackageName(childNode, actionName);
+            }
+        }
+    }
+
+    /**
 	 * generate action file with appropriate data
 	 * @param filePath
 	 * @param fileName
@@ -66,7 +111,6 @@ public class Main {
 	 * @throws IOException
 	 */
 	public void generateJSystemScenario(String filePath, String fileName, ArrayList<ArrayList<String>> actionsWithUUID, boolean scenarioWithActions) throws IOException {
-
 		// xml file header
 		String data = XML_HEADER;
 
@@ -119,9 +163,8 @@ public class Main {
 		* filename = step name
 		*/
 
-		this.saveXMLFileName(filePath,fileName + ".xml", data);
+		saveXMLFileName(filePath,fileName + ".xml", data);
 	}
-	
 
 	public void savePropertiesFile(String filePath, String fileName, UUID uuid, HashMap<String, String> paramListWithValues) throws IOException {
 		try {
@@ -223,7 +266,7 @@ public class Main {
 		}
 	}
 
-
+//
 //	public void parseActions(Node node) throws Exception {
 //		try {
 //			/* parse XML file structure */
@@ -241,7 +284,7 @@ public class Main {
 //			UUID uuidForScenario;
 //
 //			// get KeyBlockScenario
-//			NodeList scenarios = doc.getElementsByTagName(node);
+//			NodeList scenarios = doc.getElementsByTagName("KeyBlockTest");
 //
 //			for (int i = 0; i < scenarios.getLength(); i++ ) {
 //				// get the list of child like scenarioName and etc....
@@ -313,7 +356,7 @@ public class Main {
 //																log.info(String.format("step case %s", kbTestCaseName));
 //																log.info(String.format("step name %s", kbTestStepName));
 //																log.info(String.format("action %s", kbActionName));
-//																log.info(String.format("UUID %s", uuid));
+//																log.info(String.format("UUID %s", uuidForAction));
 //																log.info(String.format("params and values %s", paramListWithValues));
 //																log.info("");
 //																uuidRecord.add(uuidForAction.toString());
