@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import static java.util.Arrays.asList;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +26,7 @@ import org.apache.logging.log4j.Logger;
  * @author bogdanovich_a
  */
 public class Main {
-	static final Logger log = LogManager.getLogger(Main.class);
+	private static final Logger log = Logger.getLogger(Main.class);
 	static final String workFlowFileName = "PCRF_Basic.xml";
 	static final String workflowPath = "PCRF_Basic";
 	static final String packageFileName = "preferences.xml";
