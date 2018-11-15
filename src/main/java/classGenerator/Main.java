@@ -14,10 +14,9 @@ import javax.xml.parsers.DocumentBuilder;
 
 import static java.util.Arrays.asList;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -25,7 +24,7 @@ import org.apache.logging.log4j.Logger;
  * @author bogdanovich_a
  */
 public class Main {
-	static final Logger log = LogManager.getLogger(Main.class);
+	private static final Logger log = Logger.getLogger(Main.class);
 	static final String workFlowFileName = "PCRF_Basic.xml";
 	static final String workflowPath = "PCRF_Basic";
 	static final String packageFileName = "preferences.xml";
@@ -35,6 +34,8 @@ public class Main {
 	static final String xmlKBActions = "smp_actions.txt";
 	ArrayList<String> actionList = new ArrayList<String>();
 	ArrayList<String> paramList = new ArrayList<String>();
+
+	private final HashMap<String, String> pathsToActionsMap = new HashMap<>();
 
 	HashMap<String, String> paramListWithValues = new HashMap<String, String>();
 
@@ -71,10 +72,9 @@ public class Main {
 	/**
 	 * Method that takes package path from <preferences.xml> KB file
 	 * @param node
-	 * @param actionName
 	 * @throws Exception
 	 */
-	public void getPackageName(Node node, String actionName) throws Exception {
+	private void getPackageName(Node node) {
 		NodeList list = node.getChildNodes();
 
 		for (int i = 0; i < list.getLength(); i++) {
@@ -85,24 +85,26 @@ public class Main {
 
 				switch (nodeName) {
 					case "class":
-						if (nodeText.equals(actionName)) {
-							// FIXME: make algorithm more reliable without hardcode for xml levels
-							if (!childNode.getParentNode().getParentNode().getParentNode().getNodeName().equals("layout")) {
-								folderPath += childNode.getParentNode().getParentNode().getParentNode().getNodeName() + "/";
-							}
-
-							if (!childNode.getParentNode().getParentNode().getNodeName().equals("layout")) {
-								folderPath += childNode.getParentNode().getParentNode().getNodeName() + "/";
-							}
-
-							if (!childNode.getParentNode().getNodeName().equals("layout")) {
-								folderPath += childNode.getParentNode().getNodeName() + "/";
-							}
-							folderPath = folderPath.replace("#document/", "");
-							break;
+						// FIXME: make algorithm more reliable without hardcode for xml levels
+						if (!childNode.getParentNode().getParentNode().getParentNode().getNodeName().equals("layout")) {
+							folderPath += childNode.getParentNode().getParentNode().getParentNode().getNodeName() + "/";
 						}
+
+						if (!childNode.getParentNode().getParentNode().getNodeName().equals("layout")) {
+							folderPath += childNode.getParentNode().getParentNode().getNodeName() + "/";
+						}
+
+						if (!childNode.getParentNode().getNodeName().equals("layout")) {
+							folderPath += childNode.getParentNode().getNodeName() + "/";
+						}
+						folderPath = folderPath.replace("#document/", "");
+						break;
+
 				}
-				getPackageName(childNode, actionName);
+
+				pathsToActionsMap.put(nodeText, folderPath);
+				folderPath = "";
+				getPackageName(childNode);
 			}
 		}
 	}
@@ -147,11 +149,8 @@ public class Main {
 			testMethodName = actionName;
 		}
 
-		// get node package path (eg: folder structure) -> and put packagePath
-		Document xmlHierarchyDocument = getParserObject(packageFileName);
-		// take the correct path for KB actions from preferences.xml
-		getPackageName(xmlHierarchyDocument, actionName);
-		// convert </> folder path into package path
+		//get folder path path for action
+		folderPath = pathsToActionsMap.get(actionName);
 
 		// remove the last "." symbol
 		if (!folderPath.equals("")) {
@@ -481,11 +480,7 @@ public class Main {
 		filePath = rootXMLFolder + "\\" + filePath;
 		log.debug(">>>" + actionsWithUUID);
 
-		// get node package path (eg: folder structure) -> and put packagePath
-		Document xmlHierarchyDocument = getParserObject(packageFileName);
-		// take the correct path for KB actions from preferences.xml
-		getPackageName(xmlHierarchyDocument, actionName);
-		// convert </> folder path into package path
+		folderPath = pathsToActionsMap.get(actionName);
 
 		// remove the last "." symbol
 		if (!folderPath.equals("")) {
@@ -579,6 +574,16 @@ public class Main {
 		}
 	}
 
+
+	public void generatePathsForActionsMap(String fileName) throws Exception {
+		// get node package path (eg: folder structure) -> and put packagePath
+		Document xmlHierarchyDocument = getParserObject(fileName);
+		// take the correct path for KB actions from preferences.xml
+		getPackageName(xmlHierarchyDocument);
+
+	}
+
+
 	/**
 	 * main method for ActionClassGenerator
 	 * @param args
@@ -589,6 +594,7 @@ public class Main {
 		boolean buildClass = false;
 		
 		log.info("Script converter is started");
+		xmlParser.generatePathsForActionsMap(packageFileName);
 
 		if (buildClass) {
 			log.info("--------------------------");
