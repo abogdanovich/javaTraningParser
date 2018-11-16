@@ -590,6 +590,10 @@ public class Main {
 				paramValue = paramValue.replace("$${SMP1.Host}", "${sut:R_SMP1/connectDetails/iP}");
 				paramValue = paramValue.replace("$${NE1.Host}", "${sut:R_NE1/connectDetails/iP}");
 				paramValue = paramValue.replace("$${", "${run:");
+				if (paramValue.contains("..\\..\\tests\\SMP\\PCRF_Basic\\")) {
+					paramValue = paramValue.replace("..\\..\\tests\\SMP\\PCRF_Basic\\", "C:/JAutomationPackage/Actions/target/classes/scenarios/SMP/Quality_Gates/Gate4/SMPTests/PCRF_Basic/");
+					paramValue = paramValue.replace("\\", "/");
+				}
 
 				String data = String.format("%s.%s=%s", uuid, paramName, paramValue);
 				WriteFileBuffer.write(data);
