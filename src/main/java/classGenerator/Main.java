@@ -416,8 +416,7 @@ public class Main {
 				case "keyBlockDisplayName":
 					// description
 					actionMeaningful = childNode.getTextContent();
-
-					log.debug("meaningful >>>>>>>>> " + actionMeaningful);
+//					log.debug("meaningful >>>>>>>>> " + actionMeaningful);
 					break;
 
 				// ACTION NAME
@@ -428,12 +427,8 @@ public class Main {
 					uuidRecord.add(uuidForAction.toString());
 					uuidRecord.add(actionName);
 					uuidWithActions.add(uuidRecord);
-					log.debug("actionMeaningful >>> " + actionMeaningful);
-					if (actionMeaningful.equals("default")) {
-						log.debug(">>>>>>>> replace default <<<<<<<<<<<<");
-						actionMeaningful = actionName;
-						log.debug("actionMeaningful >>> " + actionMeaningful);
-					}
+//					log.debug("actionMeaningful >>> " + actionMeaningful);
+
 
 					break;
 
@@ -546,6 +541,12 @@ public class Main {
 			filePath = rootXMLFolder + "\\" + filePath;
 			checkDirectoryExists(filePath);
 
+			if (actionMeaningful.equals("default")) {
+				log.debug(">>>>>>>> replace default <<<<<<<<<<<<");
+				actionMeaningful = actionName;
+				log.debug("actionMeaningful >>> " + actionMeaningful);
+			}
+
 			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
 			// iterate hashmap and write lines like:
 			// uuid.paramName=param_value
@@ -574,7 +575,6 @@ public class Main {
 			log.info(String.format("File [%s] is updated", fileName));
 		}
 	}
-
 
 	public void generatePathsForActionsMap(String fileName) throws Exception {
 		// get node package path (eg: folder structure) -> and put packagePath
