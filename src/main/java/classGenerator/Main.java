@@ -540,16 +540,9 @@ public class Main {
 		try {
 			filePath = rootXMLFolder + "\\" + filePath;
 			checkDirectoryExists(filePath);
-
-			if (actionMeaningful.equals("default")) {
-				log.debug(">>>>>>>> replace default <<<<<<<<<<<<");
-				actionMeaningful = actionName;
-				log.debug("actionMeaningful >>> " + actionMeaningful);
-			}
-
+			
 			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
-			// iterate hashmap and write lines like:
-			// uuid.paramName=param_value
+			// iterate hashmap and write lines like: uuid.paramName=param_value
 			for (Map.Entry<String, String> entry : paramListWithValues.entrySet()) {
 				String paramName = entry.getKey();
 				String paramValue = entry.getValue();
@@ -566,7 +559,9 @@ public class Main {
 			// write specific configuration line
 			WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
 
-			// FIXME: need to avoid duplication of actionMeaningful for eash action
+			if (actionMeaningful.equals("default")) {
+				actionMeaningful = actionName;
+			}
 			WriteFileBuffer.write(String.format("%s.meaningfulName=%s\n", uuid, actionMeaningful));
 
 
