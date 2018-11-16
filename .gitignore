@@ -7,4 +7,8 @@ output2
 ActionClassGenerator.iml
 PCRF_Basic.xml
 preferences.xml
-out_xml_workflow
+target
+log.log
+out_xml*
+smp_actions.txt
+_Rabi*
