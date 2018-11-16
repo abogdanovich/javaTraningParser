@@ -1,8 +1,8 @@
 /**
- * this script allow to extract all actions from old KB system and
- * save them into class files with specific folder structure
- * log4j 2 is used to log actions into <logs/smp.log>
- * @author bogdanovich_a
+ * This script allows to convert class files from KB into jsystem
+ * and generate workflow from old KB automation system
+ * @author Alex Bogdanovich
+ * @author Vadim Chiritsa
  */
 package classGenerator;
 
@@ -18,10 +18,6 @@ import java.nio.file.*;
 import java.util.*;
 import static java.util.Arrays.asList;
 
-/**
- *
- * @author bogdanovich_a
- */
 public class Main {
 	// FIXME: optimize class global variables
 	private static final Logger log = Logger.getLogger(Main.class);
@@ -38,14 +34,12 @@ public class Main {
 	private final HashMap<String, String> pathsToActionsMap = new HashMap<>();
 
 	HashMap<String, String> paramListWithValues = new HashMap<String, String>();
-
 	ArrayList<ArrayList<String>> uuidWithActions = new ArrayList<ArrayList<String>>();
-
 	ArrayList<ArrayList<String>> testCaseStepsList = new ArrayList<ArrayList<String>>();
-
 	ArrayList<ArrayList<String>> fatherXmlOfTestCases = new ArrayList<ArrayList<String>>();
+	ArrayList<String> loopData = new ArrayList<>();
+
 	UUID uuidForAction = UUID.randomUUID();
-	UUID uuidForScenario = UUID.randomUUID();
 	UUID uuidForFatherXML = UUID.randomUUID();
 
 	String actionName = "";
@@ -120,11 +114,10 @@ public class Main {
 	 * @throws Exception
 	 */
 	public Document getParserObject(String fileName) throws Exception {
-		// FIXME: remove old File style opening - use NIO
-		File xmlFile = new File(fileName);
+		Path xmlFile = Paths.get(fileName);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document xmlDocument = dBuilder.parse(xmlFile);
+		Document xmlDocument = dBuilder.parse(xmlFile.toString());
 
 		return xmlDocument;
 	}
@@ -293,7 +286,7 @@ public class Main {
 		dirExists = Files.exists(dirPath);
 		if (!dirExists) {
 			Files.createDirectories(dirPath);
-			log.debug(String.format("Folder: %s was created successfully", folderPath));
+			log.info(String.format("Folder: %s was created successfully", folderPath));
 		}
 	}
 
@@ -390,71 +383,94 @@ public class Main {
 			switch (nodeName) {
 				// TEST CASE
 				case "scenarioName":
-					// JSYSTEM SCENARIO
+					// jsystem test case
 					testCase = childNode.getTextContent();
 					testCase = testCase.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
 					break;
 
 				// STEP NAME
 				case "keyBlockGroupName":
-					// JSYSTEM xml workflow
+					// jsystem test step
 					testStep = childNode.getTextContent();
 					testStep = testStep.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
-
-					uuidForScenario = UUID.randomUUID();
 					ArrayList<String> uuidStepName = new ArrayList<String>();
 
-					uuidStepName.add(uuidForScenario.toString());
+					uuidStepName.add(UUID.randomUUID().toString());
 					uuidStepName.add(testStep);
 					// save step name
 					testCaseStepsList.add(uuidStepName);
 					break;
 
 				case "keyBlockDisplayName":
-					// description
+					// jsystem test case meaningful
 					actionMeaningful = childNode.getTextContent();
-//					log.debug("meaningful >>>>>>>>> " + actionMeaningful);
 					break;
 
 				// ACTION NAME
 				case "keyBlockName":
+					// jsystem test case action name
 					ArrayList<String> uuidRecord = new ArrayList<String>();
 					actionName = childNode.getTextContent();
 					uuidForAction = UUID.randomUUID();
 					uuidRecord.add(uuidForAction.toString());
 					uuidRecord.add(actionName);
 					uuidWithActions.add(uuidRecord);
-//					log.debug("actionMeaningful >>> " + actionMeaningful);
-
-
 					break;
 
 					// params with values
 				case "KeyBlockParam":
-					Element element = (Element) childNode;
-					for (int k = 0; k < element.getElementsByTagName("paramName").getLength(); k++) {
+					// jsystem test case action name params with values
+					Element blockParamElement = (Element) childNode;
+					for (int k = 0; k < blockParamElement.getElementsByTagName("paramName").getLength(); k++) {
 						// add a new param name
-						paramListWithValues.put(element.getElementsByTagName("paramName").item(k).getTextContent(),
-								element.getElementsByTagName("paramValue").item(k).getTextContent());
+						paramListWithValues.put(blockParamElement.getElementsByTagName("paramName").item(k).getTextContent(),
+								blockParamElement.getElementsByTagName("paramValue").item(k).getTextContent());
 					}
 
 					savePropertiesFile(testCase + "\\", testStep + ".properties", uuidForAction, paramListWithValues);
 					paramListWithValues.clear();
+					break;
+
+				case "termAndLoopData":
+					// check if we have a loop for action only eg: KeyBlock action name
+					if (childNode.getParentNode().getNodeName().equals("KeyBlock")) {
+						Element loopElement = (Element) childNode;
+
+						if (loopElement.getElementsByTagName("isEnableLoop").item(0).getTextContent().equals("true")) {
+
+							int startIndex = Integer.parseInt(loopElement.getElementsByTagName("startIndex").item(0).getTextContent());
+							int endIndex = Integer.parseInt(loopElement.getElementsByTagName("endIndex").item(0).getTextContent());
+							int stepValue = Integer.parseInt(loopElement.getElementsByTagName("stepValue").item(0).getTextContent());
+							String loopValues = "";
+							// add a new param name
+							loopData.add(loopElement.getElementsByTagName("loopVariableName").item(0).getTextContent());
+
+							for (int stepvalue = startIndex; stepvalue <= endIndex; stepvalue += stepValue) {
+								loopValues += stepvalue + ";";
+							}
+							loopData.add(loopValues);
+							// in order to workflow - we need to add loop into the list > uuidWithActions
+							ArrayList<String> uuidLoopRecord = new ArrayList<>();
+							UUID uuidLoop = UUID.randomUUID();
+							uuidLoopRecord.add(uuidLoop.toString());
+							uuidLoopRecord.add("loop_enabled");
+							uuidWithActions.add(uuidLoopRecord);
+							// update properties file
+							savePropertiesFile(testCase + "\\", testStep + ".properties", uuidLoop);
+						}
+					}
 
 					break;
 
-
 				case "runState":
 					// we need to look into the last but not least node name to do not miss the last action step
-//					log.debug("PARENT >>> " + childNode.getParentNode().getNodeName());
 					if (childNode.getParentNode().getNodeName().equals("KeyBlockGroup")) {
 						generateJSystemScenario(testCase + "\\", testStep, uuidWithActions, true);
 						uuidWithActions.clear();
+						loopData.clear();
 					}
 					if (childNode.getParentNode().getNodeName().equals("KeyBlockScenario")) {
 						// new scenario - so we can save our prepared xml file
-//						log.debug("testCaseStepsList > " + testCaseStepsList);
-						//fill list for father PCRF
 						uuidForFatherXML = UUID.randomUUID();
 						ArrayList<String> uuidScenarioName = new ArrayList<String>();
 						uuidScenarioName.add(uuidForFatherXML.toString());
@@ -473,57 +489,70 @@ public class Main {
 
 	public void generateJSystemScenario(String filePath, String fileName, ArrayList<ArrayList<String>> actionsWithUUID, boolean scenarioWithActions) throws Exception {
 		// xml file header
-
 		String data =
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!--This file was auto-generated by Aliaksandr Bahdanovich auto-gen script for JSystem runner, " +
-						"do not change it manually--><project default=\"execute scenario\" name=\"scenarios/SMP/Quality_Gates/Gate4/" + workflowPath + "/" + testCase + "/" + fileName + "\">\r\n" +
-						XML_HEADER;
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<!--This file was generated by converting script. Developers: Aliaksandr Bahdanovich, Vadim Chiritsa for JSystem runner, " +
+				"do not change it manually--><project default=\"execute scenario\" name=\"scenarios/SMP/Quality_Gates/Gate4/" +
+						workflowPath + "/" + testCase + "/" + fileName + "\">\r\n" + XML_HEADER;
 
 		filePath = rootXMLFolder + "\\" + filePath;
 
 		// steps ordering
 		for (int i = 0; i < actionsWithUUID.size(); i++) {
-			data += String.format("\t\t<antcallback target=\"t%s\"/>\r\n", i);
+			if (actionsWithUUID.get(i).get(1).equals("loop_enabled")) {
+				data += "\t\t<jsystemfor delimiter=\";\" fullUuid=\"${jsystem.parent.uuid}." +
+						"${jsystem.uuid}."+ actionsWithUUID.get(i).get(0) +"\" list=\"a;b;c;d\" " +
+						"param=\"myVar\" parentName=\"${jsystem.parent.name}.${ant.project.name}\">"+
+						"\t\t\t<!--#Jsystem#-->\n" +
+						"\t\t\t\t<sequential>\n" +
+						"\t\t\t\t\t<echo message=\"Parameter: index=@{"+ loopData.get(0) +"}\"/>\n" +
+						"\t\t\t\t\t<var name=\""+ loopData.get(0) +"\" value=\"@{"+loopData.get(0)+"}\"/>\n" +
+						"\t\t\t\t\t<jsystemsetantproperties>\n" +
+						"\t\t\t\t\t\t<!--Task for updating the ant parameters file - used for reference parameters-->\n" +
+						"\t\t\t\t\t\t\t</jsystemsetantproperties>\n" +
+						"\t\t\t\t</sequential>\n" +
+						"\t\t\t</jsystemfor>";
+			}
+			else {
+				data += String.format("\t\t<antcallback target=\"t%s\"/>\r\n", i);
+			}
 		}
 
 		data += "\t</target>\r\n";
 
-		/*
-		 * step description:
-		 * actionsWithUUID.get(i).get(0) = UUID
-		 * actionsWithUUID.get(i).get(1) = Action name or <Step name> from old KB system
-		 */
+		// actionsWithUUID[UUID, actionName]
 		if (scenarioWithActions) {
 			// we generate XML file with references JSystem Actions
 			for (int i = 0; i < actionsWithUUID.size(); i++) {
-				String packagePath = pathsToActionsMap.get(actionsWithUUID.get(i).get(1));
 
-				if (!packagePath.equals("")) {
+				String packagePath = "";
+				if (!actionsWithUUID.get(i).get(1).equals("loop_enabled")) {
+					packagePath = pathsToActionsMap.get(actionsWithUUID.get(i).get(1));
 					packagePath = packagePath.replace("/", ".");
 					packagePath = packagePath.substring(0, packagePath.length() - 1);
 				}
 
 				data += String.format(
 						"\t<target name=\"t%s\">\r\n" +
-								"\t\t<jsystem showoutput=\"true\">\r\n" +
-								"\t\t\t<sysproperty key=\"jsystem.uuid\" value=\"%s\"/>\r\n" +
-								"\t\t\t<sysproperty key=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\r\n" +
-								"\t\t\t<sysproperty key=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\r\n" +
-								"\t\t\t<test name=\"automation.allot.com.Actions.KBsystem.jsystemActions." + packagePath + ".%s.%s_KB\"/>\r\n" +
-								"\t\t</jsystem>\r\n" +
-								"\t</target>\r\n", i, actionsWithUUID.get(i).get(0), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1));
+						"\t\t<jsystem showoutput=\"true\">\r\n" +
+						"\t\t\t<sysproperty key=\"jsystem.uuid\" value=\"%s\"/>\r\n" +
+						"\t\t\t<sysproperty key=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\r\n" +
+						"\t\t\t<sysproperty key=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\r\n" +
+						"\t\t\t<test name=\"automation.allot.com.Actions.KBsystem.jsystemActions." + packagePath + ".%s.%s_KB\"/>\r\n" +
+						"\t\t</jsystem>\r\n" +
+						"\t</target>\r\n", i, actionsWithUUID.get(i).get(0), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1));
 			}
 		} else {
 			// we generate XML file with references to XML files with JSystem Actions
 			for (int i = 0; i < actionsWithUUID.size(); i++) {
 				data += String.format(
 						"\t<target name=\"t%s\">\n" +
-								"\t\t<jsystem-ant antfile=\"${scenarios.base}/scenarios/SMP/Quality_Gates/Gate4/" + workflowPath + "/" + testCase + "/%s.xml\">\n" +
-								"\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
-								"\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
-								"\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
-								"\t\t</jsystem-ant>\n" +
-								"\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0));
+						"\t\t<jsystem-ant antfile=\"${scenarios.base}/scenarios/SMP/Quality_Gates/Gate4/" + workflowPath + "/" + testCase + "/%s.xml\">\n" +
+						"\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
+						"\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
+						"\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
+						"\t\t</jsystem-ant>\n" +
+						"\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0));
 			}
 		}
 
@@ -532,7 +561,6 @@ public class Main {
 
 		// save xml header and write data into file. filename = step name
 		saveFile(filePath, fileName + ".xml", data);
-
 	}
 
 	/**
@@ -547,6 +575,10 @@ public class Main {
 		try {
 			filePath = rootXMLFolder + "\\" + filePath;
 			checkDirectoryExists(filePath);
+
+			if (actionMeaningful.equals("default")) {
+				actionMeaningful = actionName;
+			}
 			
 			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
 			// iterate hashmap and write lines like: uuid.paramName=param_value
@@ -558,6 +590,10 @@ public class Main {
 				paramValue = paramValue.replace("$${SMP1.Host}", "${sut:R_SMP1/connectDetails/iP}");
 				paramValue = paramValue.replace("$${NE1.Host}", "${sut:R_NE1/connectDetails/iP}");
 				paramValue = paramValue.replace("$${", "${run:");
+				if (paramValue.contains("..\\..\\tests\\SMP\\PCRF_Basic\\")) {
+					paramValue = paramValue.replace("..\\..\\tests\\SMP\\PCRF_Basic\\", "C:/JAutomationPackage/Actions/target/classes/scenarios/SMP/Quality_Gates/Gate4/SMPTests/PCRF_Basic/");
+					paramValue = paramValue.replace("\\", "/");
+				}
 
 				String data = String.format("%s.%s=%s", uuid, paramName, paramValue);
 				WriteFileBuffer.write(data);
@@ -565,16 +601,33 @@ public class Main {
 			}
 			// write specific configuration line
 			WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
-
-			if (actionMeaningful.equals("default")) {
-				actionMeaningful = actionName;
-			}
 			WriteFileBuffer.write(String.format("%s.meaningfulName=%s\n", uuid, actionMeaningful));
-
 
 			WriteFileBuffer.close();
 		} finally {
+
 			log.info(String.format("File [%s] is updated", fileName));
+		}
+	}
+
+	// update properties files with appropriate data for specific uuid
+	public void savePropertiesFile(String filePath, String fileName, UUID uuid) throws IOException {
+		try {
+			filePath = rootXMLFolder + "\\" + filePath;
+			checkDirectoryExists(filePath);
+
+			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
+			// write specific configuration line
+
+			if (!loopData.isEmpty()) {
+				WriteFileBuffer.write(String.format("%s.list=%s\n", uuid, loopData.get(1)));
+				WriteFileBuffer.write(String.format("%s.loop\\ value=%s\n", uuid, loopData.get(0)));
+				WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
+			}
+
+			WriteFileBuffer.close();
+		} finally {
+			log.info(String.format("Properties file [%s] is updated", fileName));
 		}
 	}
 
@@ -590,7 +643,6 @@ public class Main {
 
 	public void generateJSystemWorkflowScenario(String filePath, String fileName, ArrayList<ArrayList<String>> actionsWithUUID) throws Exception {
 		// xml file header
-		log.debug(">>>>>>>>>>>>>>>>>>>> " + workflowPath + " / " + fileName);
 		String data =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!--This file was auto-generated by Aliaksandr Bahdanovich auto-gen script for JSystem runner, " +
 						"do not change it manually--><project default=\"execute scenario\" name=\"scenarios/SMP/Quality_Gates/Gate4/" + workflowPath  + "/" + fileName + "\">\r\n" +
@@ -607,21 +659,20 @@ public class Main {
 		data += "\t</target>\r\n";
 
 		/*
-		 * step description:
 		 * actionsWithUUID.get(i).get(0) = UUID
 		 * actionsWithUUID.get(i).get(1) = Action name or <Step name> from old KB system
 		 */
-			// we generate XML file with references to XML files with JSystem Actions
-			for (int i = 0; i < actionsWithUUID.size(); i++) {
-				data += String.format(
-						"\t<target name=\"t%s\">\n" +
-								"\t\t<jsystem-ant antfile=\"${scenarios.base}/scenarios/SMP/Quality_Gates/Gate4/" + workflowPath + "/%s/%s.xml\">\n" +
-								"\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
-								"\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
-								"\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
-								"\t\t</jsystem-ant>\n" +
-								"\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0));
-			}
+		// we generate XML file with references to XML files with JSystem Actions
+		for (int i = 0; i < actionsWithUUID.size(); i++) {
+			data += String.format(
+					"\t<target name=\"t%s\">\n" +
+							"\t\t<jsystem-ant antfile=\"${scenarios.base}/scenarios/SMP/Quality_Gates/Gate4/" + workflowPath + "/%s/%s.xml\">\n" +
+							"\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
+							"\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
+							"\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
+							"\t\t</jsystem-ant>\n" +
+							"\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0));
+		}
 
 		// xml file last line
 		data += XML_FOOTER;
@@ -643,7 +694,6 @@ public class Main {
 		
 		log.info("Script converter is started");
 		xmlParser.generatePathsForActionsMap(packageFileName);
-//		log.debug(xmlParser.pathsToActionsMap);
 
 		if (buildClass) {
 			log.info("--------------------------");
