@@ -413,8 +413,7 @@ public class Main {
 				case "keyBlockDisplayName":
 					// description
 					actionMeaningful = childNode.getTextContent();
-
-					log.debug("meaningful >>>>>>>>> " + actionMeaningful);
+//					log.debug("meaningful >>>>>>>>> " + actionMeaningful);
 					break;
 
 				// ACTION NAME
@@ -425,12 +424,8 @@ public class Main {
 					uuidRecord.add(uuidForAction.toString());
 					uuidRecord.add(actionName);
 					uuidWithActions.add(uuidRecord);
-					log.debug("actionMeaningful >>> " + actionMeaningful);
-					if (actionMeaningful.equals("default")) {
-						log.debug(">>>>>>>> replace default <<<<<<<<<<<<");
-						actionMeaningful = actionName;
-						log.debug("actionMeaningful >>> " + actionMeaningful);
-					}
+//					log.debug("actionMeaningful >>> " + actionMeaningful);
+
 
 					break;
 
@@ -552,10 +547,9 @@ public class Main {
 		try {
 			filePath = rootXMLFolder + "\\" + filePath;
 			checkDirectoryExists(filePath);
-
+			
 			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
-			// iterate hashmap and write lines like:
-			// uuid.paramName=param_value
+			// iterate hashmap and write lines like: uuid.paramName=param_value
 			for (Map.Entry<String, String> entry : paramListWithValues.entrySet()) {
 				String paramName = entry.getKey();
 				String paramValue = entry.getValue();
@@ -572,7 +566,9 @@ public class Main {
 			// write specific configuration line
 			WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
 
-			// FIXME: need to avoid duplication of actionMeaningful for eash action
+			if (actionMeaningful.equals("default")) {
+				actionMeaningful = actionName;
+			}
 			WriteFileBuffer.write(String.format("%s.meaningfulName=%s\n", uuid, actionMeaningful));
 
 
@@ -581,7 +577,6 @@ public class Main {
 			log.info(String.format("File [%s] is updated", fileName));
 		}
 	}
-
 
 	public void generatePathsForActionsMap(String fileName) throws Exception {
 		// get node package path (eg: folder structure) -> and put packagePath
