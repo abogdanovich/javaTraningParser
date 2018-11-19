@@ -464,6 +464,11 @@ public class Main {
 
 				case "runState":
 					// we need to look into the last but not least node name to do not miss the last action step
+
+					//if KeyBlock, then we have 'runstate' for test actions and add it to the properties
+					if (childNode.getParentNode().getNodeName().equals("KeyBlock")) {
+						savePropertiesFile(testCase + "\\", testStep + ".properties", uuidForAction, childNode.getTextContent());
+					}
 					if (childNode.getParentNode().getNodeName().equals("KeyBlockGroup")) {
 						generateJSystemScenario(testCase + "\\", testStep, uuidWithActions, true);
 						uuidWithActions.clear();
@@ -579,7 +584,7 @@ public class Main {
 			if (actionMeaningful.equals("default")) {
 				actionMeaningful = actionName;
 			}
-			
+
 			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
 			// iterate hashmap and write lines like: uuid.paramName=param_value
 			for (Map.Entry<String, String> entry : paramListWithValues.entrySet()) {
@@ -609,6 +614,23 @@ public class Main {
 			log.info(String.format("File [%s] is updated", fileName));
 		}
 	}
+
+    //for checkboxes
+	public void savePropertiesFile(String filePath, String fileName, UUID uuid, String isDisabled) throws IOException {
+		try {
+			filePath = rootXMLFolder + "\\" + filePath;
+			checkDirectoryExists(filePath);
+
+			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
+			Boolean checkBox = !Boolean.valueOf(isDisabled);
+			// write specific configuration line
+			WriteFileBuffer.write(String.format("%s.jsystem.isdisabled=%s\n", uuid, checkBox.toString()));
+			WriteFileBuffer.close();
+		} finally {
+			log.info(String.format("File [%s] is updated", fileName));
+		}
+	}
+
 
 	// update properties files with appropriate data for specific uuid
 	public void savePropertiesFile(String filePath, String fileName, UUID uuid) throws IOException {
@@ -659,6 +681,7 @@ public class Main {
 		data += "\t</target>\r\n";
 
 		/*
+		 * step description:
 		 * actionsWithUUID.get(i).get(0) = UUID
 		 * actionsWithUUID.get(i).get(1) = Action name or <Step name> from old KB system
 		 */
