@@ -282,7 +282,7 @@ public class Main {
 	 * @param params
 	 * @throws IOException
 	 */
-	public void generateActionFile(String actionName, ArrayList<String> params) throws Exception {
+	public void generateActionClass(String actionName, ArrayList<String> params) throws Exception {
 		String data = new String();
 		String actionNameOriginal = actionName;
 		String testMethodName = "";
@@ -465,7 +465,7 @@ public class Main {
 				case "keyBlockRepeatCount":
 					// generate class file
 					if (!paramList.isEmpty() && !actionName.equals("")) {
-						generateActionFile(actionName, paramList);
+						generateActionClass(actionName, paramList);
 						paramList.clear();
 					}
 					break;
@@ -571,8 +571,6 @@ public class Main {
 					break;
 
 				case "runState":
-					// we need to look into the last but not least node name to do not miss the last action step
-
 					//if KeyBlock, then we have 'runstate' for test actions and add it to the properties
 					if (childNode.getParentNode().getNodeName().equals("KeyBlock")) {
 						savePropertiesFile(testCase + "\\", testStep + ".properties", uuidForAction, childNode.getTextContent());
@@ -738,7 +736,7 @@ public class Main {
 		}
 	}
 
-	public static void main(String[] args) throws Exception, DirectoryIteratorException {
+	public static void main(String[] args) throws Exception {
 		Main xmlParser = new Main();
 
 		// leave as 'false' to work with workflow
