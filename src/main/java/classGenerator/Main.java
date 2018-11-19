@@ -25,10 +25,11 @@ public class Main {
 	static final String workFlowFileName = "PCRF_Basic.xml";
 	static final String workflowPath = "PCRF_Basic";
 	static final String packageFileName = "preferences.xml";
-	static final String rootXMLFolder = "out_xml_workflow";
+	static final String rootXMLFolder = workflowPath;
 	static final String rootClassFolder = "out_class_files";
 	static final String xmlKBFiles = "d:\\allot\\oldKB\\trunk\\SW\\bin\\res\\xml\\";
 	static final String xmlKBActions = "smp_actions.txt";
+	static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
 	ArrayList<String> actionList = new ArrayList<String>();
 	ArrayList<String> paramList = new ArrayList<String>();
 
@@ -52,7 +53,7 @@ public class Main {
 	String packagePath = "";
 	static final String XML_FOOTER = "</project>";
 	static final String XML_HEADER =
-					"\t<property name=\"test.parameters.file.name\" value=\".testPropertiesFile_Empty\"/>\r\n" +
+			"\t<property name=\"test.parameters.file.name\" value=\".testPropertiesFile_Empty\"/>\r\n" +
 					"\t<property name=\"scenario.version\" value=\"JSystem5_1\"/>\r\n" +
 					"\t<property name=\"jsystem.uuid\" value=\"\"/>\r\n" +
 					"\t<property name=\"jsystem.parent.uuid\" value=\"\"/>\r\n" +
@@ -155,27 +156,27 @@ public class Main {
 		}
 
 		data =
-			"/**\r\n" +
-			"* " + actionName + " class with appropriate KB old actions\r\n"  +
-			"* @author bogdanovich_a\r\n" +
-			"*/\r\n" +
-			"package automation.allot.com.Actions.KBsystem.jsystemActions." + packagePath + ";\r\n" +
-			"\r\n" +
-			"import java.util.ArrayList;\r\n" +
-			"import java.util.List;\r\n" +
-			"\r\n" +
-			"import org.junit.After;\r\n" +
-			"import org.junit.Before;\r\n" +
-			"import org.junit.Test;\r\n" +
-			"\r\n" +
-			"import automation.allot.com.Actions.KBsystem.QaAutomation.internal.utils.KBParam;\r\n" +
-			"import jsystem.framework.TestProperties;\r\n" +
-			"import jsystem.framework.report.Reporter;\r\n" +
-			"import junit.framework.SystemTestCase4;\r\n" +
-			"\r\n" +
-			"public class " + actionName + " extends SystemTestCase4 {\r\n" +
-			"\r\n" +
-			"\t // class variables for the given Action\r\n";
+				"/**\r\n" +
+						"* " + actionName + " class with appropriate KB old actions\r\n"  +
+						"* @author bogdanovich_a\r\n" +
+						"*/\r\n" +
+						"package automation.allot.com.Actions.KBsystem.jsystemActions." + packagePath + ";\r\n" +
+						"\r\n" +
+						"import java.util.ArrayList;\r\n" +
+						"import java.util.List;\r\n" +
+						"\r\n" +
+						"import org.junit.After;\r\n" +
+						"import org.junit.Before;\r\n" +
+						"import org.junit.Test;\r\n" +
+						"\r\n" +
+						"import automation.allot.com.Actions.KBsystem.QaAutomation.internal.utils.KBParam;\r\n" +
+						"import jsystem.framework.TestProperties;\r\n" +
+						"import jsystem.framework.report.Reporter;\r\n" +
+						"import junit.framework.SystemTestCase4;\r\n" +
+						"\r\n" +
+						"public class " + actionName + " extends SystemTestCase4 {\r\n" +
+						"\r\n" +
+						"\t // class variables for the given Action\r\n";
 
 		// put here all action params !
 		for (int i=0; i < params.size(); i++) {
@@ -183,25 +184,25 @@ public class Main {
 		};
 
 		data +=
-			"\r\n" +
-			"\t /**\r\n" +
-			"\t * @throws java.lang.Exception\r\n" +
-			"\t */\r\n" +
-			"\t @Before\r\n" +
-			"\t public void setUp() throws Exception {\r\n" +
-			"\t }\r\n" +
-			"\r\n" +
-			"\t /**\r\n" +
-			"\t * @throws java.lang.Exception\r\n" +
-			"\t */\r\n" +
-			"\t @After\r\n" +
-			"\t public void tearDown() throws Exception {\r\n" +
-			"\t }\r\n" +
-			"\r\n" +
-			"\t /**\r\n" +
-			"\t * KB System action: "+actionName+" \r\n" +
-			"\t */\r\n" +
-			"\t @TestProperties(paramsInclude = {";
+				"\r\n" +
+						"\t /**\r\n" +
+						"\t * @throws java.lang.Exception\r\n" +
+						"\t */\r\n" +
+						"\t @Before\r\n" +
+						"\t public void setUp() throws Exception {\r\n" +
+						"\t }\r\n" +
+						"\r\n" +
+						"\t /**\r\n" +
+						"\t * @throws java.lang.Exception\r\n" +
+						"\t */\r\n" +
+						"\t @After\r\n" +
+						"\t public void tearDown() throws Exception {\r\n" +
+						"\t }\r\n" +
+						"\r\n" +
+						"\t /**\r\n" +
+						"\t * KB System action: "+actionName+" \r\n" +
+						"\t */\r\n" +
+						"\t @TestProperties(paramsInclude = {";
 
 		// put here all action params !
 		for (int i=0; i < params.size(); i++) {
@@ -214,63 +215,63 @@ public class Main {
 		}
 
 		data +=
-			"})\r\n" +
-			"\t @Test\r\n" +
-			"\t public void " + actionName + "_KB() {\r\n" +
-			"\r\n" +
-			"\t\t // prepare parameters\r\n" +
-			"\t\t List<KBParam> params = new ArrayList<>();\r\n";
+				"})\r\n" +
+						"\t @Test\r\n" +
+						"\t public void " + actionName + "_KB() {\r\n" +
+						"\r\n" +
+						"\t\t // prepare parameters\r\n" +
+						"\t\t List<KBParam> params = new ArrayList<>();\r\n";
 
 		// put here all action params !
 		for (int i=0; i < params.size(); i++) {
 			data += String.format("\t\t params.add(new KBParam(\"%s\", %s, \"text\", \"\", false, false)); \r\n",
 					params.get(i), params.get(i));
 		};
-		
-		data += 
-		"\r\n" + 
-		"\t\t // execute KB action\r\n" +
-		"\t\t automation.allot.com.Actions.KBsystem.QaAutomation." + packagePath + "." + testMethodName + " " + actionName.toLowerCase() +
-				" =  new automation.allot.com.Actions.KBsystem.QaAutomation."
-				+ packagePath + "." + testMethodName +"(\"\", params);\r\n" +
-		"\t\t "+actionName.toLowerCase()+".run();\r\n" + 
-		"\r\n" + 
-		"\t\t if ("+actionName.toLowerCase()+".success() == true) {\r\n" + 
-		"\t\t\t report.report(\"KeyBlock Action SUCCESS\", report.PASS);\r\n" +
-		"\t\t } else {\r\n" + 
-		"\t\t\treport.report(\"KeyBlock Action FAILED\", report.FAIL);\r\n" +
-		"\t\t }\r\n" + 
-		"\t } \r\n" + 
-		"\r\n" + 
-		"\t // actions getter\r\n";
+
+		data +=
+				"\r\n" +
+						"\t\t // execute KB action\r\n" +
+						"\t\t automation.allot.com.Actions.KBsystem.QaAutomation." + packagePath + "." + testMethodName + " " + actionName.toLowerCase() +
+						" =  new automation.allot.com.Actions.KBsystem.QaAutomation."
+						+ packagePath + "." + testMethodName +"(\"\", params);\r\n" +
+						"\t\t "+actionName.toLowerCase()+".run();\r\n" +
+						"\r\n" +
+						"\t\t if ("+actionName.toLowerCase()+".success() == true) {\r\n" +
+						"\t\t\t report.report(\"KeyBlock Action SUCCESS\", report.PASS);\r\n" +
+						"\t\t } else {\r\n" +
+						"\t\t\treport.report(\"KeyBlock Action FAILED\", report.FAIL);\r\n" +
+						"\t\t }\r\n" +
+						"\t } \r\n" +
+						"\r\n" +
+						"\t // actions getter\r\n";
 
 		// generate all params getters
 		for (int i=0; i < params.size(); i++) {
 			data += String.format(
-					"\r\n" + 
-					"\t /**\r\n" + 
-					"\t * \r\n" + 
-					"\t * @return %s \r\n" + 
-					"\t */\r\n" + 
-					"\t public String get%s() {\r\n" +
-					"\t\t return this.%s;\r\n" + 
-					"\t } \r\n"
+					"\r\n" +
+							"\t /**\r\n" +
+							"\t * \r\n" +
+							"\t * @return %s \r\n" +
+							"\t */\r\n" +
+							"\t public String get%s() {\r\n" +
+							"\t\t return this.%s;\r\n" +
+							"\t } \r\n"
 					, params.get(i), params.get(i), params.get(i));
 		}
 
 		data += "\t // actions setter\r\n";
-		
+
 		// generate all params setters
 		for (int i=0; i < params.size(); i++) {
 			data += String.format(
-					"\r\n" + 
-					"\t /**\r\n" + 
-					"\t * \r\n" + 
-					"\t * @param %s the %s set\r\n" + 
-					"\t */\r\n" + 
-					"\t public void set%s(String %s) {\r\n" +
-					"\t\t this.%s = %s;\r\n" + 
-					"\t } \r\n"
+					"\r\n" +
+							"\t /**\r\n" +
+							"\t * \r\n" +
+							"\t * @param %s the %s set\r\n" +
+							"\t */\r\n" +
+							"\t public void set%s(String %s) {\r\n" +
+							"\t\t this.%s = %s;\r\n" +
+							"\t } \r\n"
 					, params.get(i), params.get(i), params.get(i),
 					params.get(i), params.get(i), params.get(i));
 		}
@@ -292,7 +293,7 @@ public class Main {
 	}
 
 	/**
-	 * save data into Class file 
+	 * save data into Class file
 	 * @param fileName
 	 * @param data
 	 * @throws IOException
@@ -418,7 +419,7 @@ public class Main {
 					uuidWithActions.add(uuidRecord);
 					break;
 
-					// params with values
+				// params with values
 				case "KeyBlockParam":
 					// jsystem test case action name params with values
 					Element blockParamElement = (Element) childNode;
@@ -449,6 +450,8 @@ public class Main {
 							for (int stepvalue = startIndex; stepvalue <= endIndex; stepvalue += stepValue) {
 								loopValues += stepvalue + ";";
 							}
+							// remove the last ';' symbol
+                            loopValues = loopValues.substring(0, loopValues.length() - 1);
 							loopData.add(loopValues);
 							// in order to workflow - we need to add loop into the list > uuidWithActions
 							ArrayList<String> uuidLoopRecord = new ArrayList<>();
@@ -497,27 +500,29 @@ public class Main {
 		// xml file header
 		String data =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<!--This file was generated by converting script. Developers: Aliaksandr Bahdanovich, Vadim Chiritsa for JSystem runner, " +
-				"do not change it manually--><project default=\"execute scenario\" name=\"scenarios/SMP/Quality_Gates/Gate4/" +
+						"<!--This file was generated by converting script. Developers: Aliaksandr Bahdanovich, Vadim Chiritsa for JSystem runner, " +
+						"do not change it manually--><project default=\"execute scenario\" name=\"/" + smpTestPath +
 						workflowPath + "/" + testCase + "/" + fileName + "\">\r\n" + XML_HEADER;
 
 		filePath = rootXMLFolder + "\\" + filePath;
 
 		// steps ordering
 		for (int i = 0; i < actionsWithUUID.size(); i++) {
-			if (actionsWithUUID.get(i).get(1).equals("loop_enabled")) {
+			if ((i < actionsWithUUID.size()-1) && (actionsWithUUID.get(i+1).get(1).equals("loop_enabled"))) {
 				data += "\t\t<jsystemfor delimiter=\";\" fullUuid=\"${jsystem.parent.uuid}." +
-						"${jsystem.uuid}."+ actionsWithUUID.get(i).get(0) +"\" list=\"a;b;c;d\" " +
-						"param=\"myVar\" parentName=\"${jsystem.parent.name}.${ant.project.name}\">"+
+						"${jsystem.uuid}."+ actionsWithUUID.get(i+1).get(0) +"\" list=\"a;b;c;d\" " +
+						"param=\"myVar\" parentName=\"${jsystem.parent.name}.${ant.project.name}\">\n"+
 						"\t\t\t<!--#Jsystem#-->\n" +
-						"\t\t\t\t<sequential>\n" +
-						"\t\t\t\t\t<echo message=\"Parameter: index=@{"+ loopData.get(0) +"}\"/>\n" +
+						"\t\t\t<sequential>\n" +
+						"\t\t\t\t<echo message=\"Parameter: index=@{"+ loopData.get(0) +"}\"/>\n" +
 						"\t\t\t\t\t<var name=\""+ loopData.get(0) +"\" value=\"@{"+loopData.get(0)+"}\"/>\n" +
 						"\t\t\t\t\t<jsystemsetantproperties>\n" +
 						"\t\t\t\t\t\t<!--Task for updating the ant parameters file - used for reference parameters-->\n" +
-						"\t\t\t\t\t\t\t</jsystemsetantproperties>\n" +
-						"\t\t\t\t</sequential>\n" +
-						"\t\t\t</jsystemfor>";
+						"\t\t\t\t\t</jsystemsetantproperties>\n" +
+						"\t\t\t\t\t<antcallback target=\"t" + i + "\"/>\n" +
+						"\t\t\t</sequential>\n" +
+						"\t\t\t</jsystemfor>\n";
+				break;
 			}
 			else {
 				data += String.format("\t\t<antcallback target=\"t%s\"/>\r\n", i);
@@ -540,25 +545,25 @@ public class Main {
 
 				data += String.format(
 						"\t<target name=\"t%s\">\r\n" +
-						"\t\t<jsystem showoutput=\"true\">\r\n" +
-						"\t\t\t<sysproperty key=\"jsystem.uuid\" value=\"%s\"/>\r\n" +
-						"\t\t\t<sysproperty key=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\r\n" +
-						"\t\t\t<sysproperty key=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\r\n" +
-						"\t\t\t<test name=\"automation.allot.com.Actions.KBsystem.jsystemActions." + packagePath + ".%s.%s_KB\"/>\r\n" +
-						"\t\t</jsystem>\r\n" +
-						"\t</target>\r\n", i, actionsWithUUID.get(i).get(0), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1));
+								"\t\t<jsystem showoutput=\"true\">\r\n" +
+								"\t\t\t<sysproperty key=\"jsystem.uuid\" value=\"%s\"/>\r\n" +
+								"\t\t\t<sysproperty key=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\r\n" +
+								"\t\t\t<sysproperty key=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\r\n" +
+								"\t\t\t<test name=\"automation.allot.com.Actions.KBsystem.jsystemActions." + packagePath + ".%s.%s_KB\"/>\r\n" +
+								"\t\t</jsystem>\r\n" +
+								"\t</target>\r\n", i, actionsWithUUID.get(i).get(0), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1));
 			}
 		} else {
 			// we generate XML file with references to XML files with JSystem Actions
 			for (int i = 0; i < actionsWithUUID.size(); i++) {
 				data += String.format(
 						"\t<target name=\"t%s\">\n" +
-						"\t\t<jsystem-ant antfile=\"${scenarios.base}/scenarios/SMP/Quality_Gates/Gate4/" + workflowPath + "/" + testCase + "/%s.xml\">\n" +
-						"\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
-						"\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
-						"\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
-						"\t\t</jsystem-ant>\n" +
-						"\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0));
+								"\t\t<jsystem-ant antfile=\"${scenarios.base}/" + smpTestPath + workflowPath + "/" + testCase + "/%s.xml\">\n" +
+								"\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
+								"\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
+								"\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
+								"\t\t</jsystem-ant>\n" +
+								"\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0));
 			}
 		}
 
@@ -596,9 +601,12 @@ public class Main {
 				paramValue = paramValue.replace("$${SMP1.Host}", "${sut:R_SMP1/connectDetails/iP}");
 				paramValue = paramValue.replace("$${NE1.Host}", "${sut:R_NE1/connectDetails/iP}");
 				paramValue = paramValue.replace("$${", "${run:");
-				if (paramValue.contains("..\\..\\tests\\SMP\\PCRF_Basic\\")) {
-					paramValue = paramValue.replace("..\\..\\tests\\SMP\\PCRF_Basic\\", "C:/JAutomationPackage/Actions/target/classes/scenarios/SMP/Quality_Gates/Gate4/SMPTests/PCRF_Basic/");
-					paramValue = paramValue.replace("\\", "/");
+				if (paramValue.contains("..\\..\\tests\\SMP\\")) {
+					// all specific test data files should be under test_suite/data folder
+					paramValue = paramValue.replace("..\\..\\tests\\SMP\\", "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "data/");
+					if (paramValue.contains("/")) {
+						paramValue = paramValue.replace("\\", "/");
+					}
 				}
 
 				String data = String.format("%s.%s=%s", uuid, paramName, paramValue);
@@ -616,7 +624,7 @@ public class Main {
 		}
 	}
 
-    //for checkboxes
+	//for checkboxes
 	public void savePropertiesFile(String filePath, String fileName, UUID uuid, String isDisabled) throws IOException {
 		try {
 			filePath = rootXMLFolder + "\\" + filePath;
@@ -668,7 +676,7 @@ public class Main {
 		// xml file header
 		String data =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!--This file was auto-generated by Aliaksandr Bahdanovich auto-gen script for JSystem runner, " +
-						"do not change it manually--><project default=\"execute scenario\" name=\"scenarios/SMP/Quality_Gates/Gate4/" + workflowPath  + "/" + fileName + "\">\r\n" +
+						"do not change it manually--><project default=\"execute scenario\" name=\"/" + smpTestPath + workflowPath  + "/" + fileName + "\">\r\n" +
 						XML_HEADER;
 
 		filePath = rootXMLFolder + "\\" + filePath;
@@ -690,7 +698,7 @@ public class Main {
 		for (int i = 0; i < actionsWithUUID.size(); i++) {
 			data += String.format(
 					"\t<target name=\"t%s\">\n" +
-							"\t\t<jsystem-ant antfile=\"${scenarios.base}/scenarios/SMP/Quality_Gates/Gate4/" + workflowPath + "/%s/%s.xml\">\n" +
+							"\t\t<jsystem-ant antfile=\"${scenarios.base}/" + smpTestPath + workflowPath + "/%s/%s.xml\">\n" +
 							"\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
 							"\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
 							"\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
@@ -718,7 +726,6 @@ public class Main {
 	}
 
 
-
 	/**
 	 * main method for ActionClassGenerator
 	 * @param args
@@ -728,10 +735,12 @@ public class Main {
 		Main xmlParser = new Main();
 		boolean buildClass = false;
 
-		String srcDir ="D:\\data\\allot\\GITs_project\\javaTraningParser\\out_xml_workflow";
-		String destinationDir ="D:\\data\\allot\\GITs_project\\javaTraningParser\\src\\main\\java\\classGenerator\\out_xml_workflow";
-		
 		log.info("Script converter is started");
+		// cleanup
+		FileUtils.deleteDirectory(new File(workflowPath));
+		FileUtils.deleteDirectory(new File("C:/JAutomationPackage/"));
+
+		//run
 		xmlParser.generatePathsForActionsMap(packageFileName);
 
 		if (buildClass) {
@@ -756,11 +765,17 @@ public class Main {
 		log.info("XML WORKFLOW GENERATOR is started");
 		Document xmlWorkFlowDocument = xmlParser.getParserObject(workFlowFileName);
 		xmlParser.parseKBWorkflow(xmlWorkFlowDocument);
-		log.info("Well done!");
 
 		//generate father PCRF_basic
 		xmlParser.generateJSystemWorkflowScenario( "", workflowPath, xmlParser.fatherXmlOfTestCases);
 
-		xmlParser.copyDirectoryWithFilesFromTo(srcDir, destinationDir);
+		// copy folders
+		Thread.sleep(2000);
+		xmlParser.copyDirectoryWithFilesFromTo("d:\\allot\\testFRAMEWORK\\oldKB\\trunk\\tests\\SMP\\PCRF_Basic", workflowPath + "\\data\\PCRF_Basic\\");
+		Thread.sleep(2000);
+		xmlParser.copyDirectoryWithFilesFromTo("d:\\allot\\testFRAMEWORK\\oldKB\\trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
+		Thread.sleep(2000);
+		xmlParser.copyDirectoryWithFilesFromTo(workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "PCRF_Basic/"); //"scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
+		log.info("Well done!");
 	}
 }
