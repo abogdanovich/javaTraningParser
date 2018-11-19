@@ -6,6 +6,7 @@
  */
 package classGenerator;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -705,6 +706,18 @@ public class Main {
 
 	}
 
+	public void copyDirectoryWithFilesFromTo(String scrDir,String destinationDir){
+		File srcDir = new File(scrDir);
+		File destDir = new File(destinationDir);
+        //if dir is not exist, this dir will be created
+		try {
+			FileUtils.copyDirectory(srcDir, destDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 
 	/**
 	 * main method for ActionClassGenerator
@@ -714,6 +727,9 @@ public class Main {
 	public static void main(String[] args) throws Exception, DirectoryIteratorException {
 		Main xmlParser = new Main();
 		boolean buildClass = false;
+
+		String srcDir ="D:\\data\\allot\\GITs_project\\javaTraningParser\\out_xml_workflow";
+		String destinationDir ="D:\\data\\allot\\GITs_project\\javaTraningParser\\src\\main\\java\\classGenerator\\out_xml_workflow";
 		
 		log.info("Script converter is started");
 		xmlParser.generatePathsForActionsMap(packageFileName);
@@ -744,5 +760,7 @@ public class Main {
 
 		//generate father PCRF_basic
 		xmlParser.generateJSystemWorkflowScenario( "", workflowPath, xmlParser.fatherXmlOfTestCases);
+
+		xmlParser.copyDirectoryWithFilesFromTo(srcDir, destinationDir);
 	}
 }
