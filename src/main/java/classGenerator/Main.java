@@ -22,23 +22,27 @@ import static java.util.Arrays.asList;
 public class Main {
 	// FIXME: optimize class global variables
 	private static final Logger log = Logger.getLogger(Main.class);
+
 	static final String workFlowFileName = "PCRF_Basic.xml";
 	static final String workflowPath = "PCRF_Basic";
 	static final String packageFileName = "preferences.xml";
 	static final String rootXMLFolder = workflowPath;
-	static final String rootClassFolder = "out_class_files";
+
+	static final String rootClassFolder = workflowPath + "_class";
 	static final String xmlKBFiles = "d:\\allot\\oldKB\\trunk\\SW\\bin\\res\\xml\\";
 	static final String xmlKBActions = "smp_actions.txt";
+
 	static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
-	ArrayList<String> actionList = new ArrayList<String>();
-	ArrayList<String> paramList = new ArrayList<String>();
+
+	ArrayList<String> actionList = new ArrayList<>();
+	ArrayList<String> paramList = new ArrayList<>();
 
 	private final HashMap<String, String> pathsToActionsMap = new HashMap<>();
+	private final HashMap<String, String> paramListWithValues = new HashMap<>();
 
-	HashMap<String, String> paramListWithValues = new HashMap<String, String>();
-	ArrayList<ArrayList<String>> uuidWithActions = new ArrayList<ArrayList<String>>();
-	ArrayList<ArrayList<String>> testCaseStepsList = new ArrayList<ArrayList<String>>();
-	ArrayList<ArrayList<String>> fatherXmlOfTestCases = new ArrayList<ArrayList<String>>();
+	ArrayList<ArrayList<String>> uuidWithActions = new ArrayList<>();
+	ArrayList<ArrayList<String>> testCaseStepsList = new ArrayList<>();
+	ArrayList<ArrayList<String>> fatherXmlOfTestCases = new ArrayList<>();
 	ArrayList<String> loopData = new ArrayList<>();
 
 	UUID uuidForAction = UUID.randomUUID();
@@ -122,6 +126,154 @@ public class Main {
 		Document xmlDocument = dBuilder.parse(xmlFile.toString());
 
 		return xmlDocument;
+	}
+
+	public boolean checkFileExists(String fileName) {
+		Path file = Paths.get(fileName);
+		if (Files.exists(file)) {
+			return true;
+		}
+		return false;
+	}
+
+	public void checkDirectoryExists(String path) throws IOException {
+		Path dirPath = Paths.get(path);
+		boolean dirExists;
+		dirExists = Files.exists(dirPath);
+		if (!dirExists) {
+			Files.createDirectories(dirPath);
+			log.info(String.format("Folder: %s was created successfully", folderPath));
+		}
+	}
+
+	/**
+	 * save data into Class file
+	 * @param fileName
+	 * @param data
+	 * @throws IOException
+	 */
+	public void saveFile(String Folder,  String fileName, String data) throws IOException {
+		try {
+			boolean checkFileExists;
+			// create a directory if not exists
+			checkDirectoryExists(Folder);
+			// check if that file is already exists
+			checkFileExists = checkFileExists(Folder+fileName);
+
+			// next is to write file into this directory
+			if (checkFileExists) {
+				fileName = "_" + fileName;
+			}
+			FileWriter fw = new FileWriter(Folder + "\\" + fileName);
+			BufferedWriter WriteFileBuffer = new BufferedWriter(fw);
+			WriteFileBuffer.write(data);
+			WriteFileBuffer.close();
+		} finally {
+			// make cleanup global variables
+			folderPath = "";
+			packagePath = "";
+			log.info(String.format("File %s saved successfully", fileName));
+		}
+	}
+
+	/**
+	 * Append properties files with uuid:param={value}
+	 * @param filePath
+	 * @param fileName
+	 * @param uuid
+	 * @param paramListWithValues
+	 * @throws IOException
+	 */
+	public void savePropertiesFile(String filePath, String fileName, UUID uuid, HashMap<String, String> paramListWithValues) throws IOException {
+		try {
+			filePath = rootXMLFolder + "\\" + filePath;
+			checkDirectoryExists(filePath);
+
+			if (actionMeaningful.equals("default")) {
+				actionMeaningful = actionName;
+			}
+
+			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
+			// iterate hashmap and write lines like: uuid.paramName=param_value
+			for (Map.Entry<String, String> entry : paramListWithValues.entrySet()) {
+				String paramName = entry.getKey();
+				String paramValue = entry.getValue();
+
+				// rspecial rules should be applied for param values
+				paramValue = paramValue.replace("$${SMP1.Host}", "${sut:R_SMP1/connectDetails/iP}");
+				paramValue = paramValue.replace("$${NE1.Host}", "${sut:R_NE1/connectDetails/iP}");
+				paramValue = paramValue.replace("$${", "${run:");
+				if (paramValue.contains("..\\..\\tests\\SMP\\")) {
+					// all specific test data files should be under test_suite/data folder
+					paramValue = paramValue.replace("..\\..\\tests\\SMP\\", "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "data/");
+					if (paramValue.contains("/")) {
+						paramValue = paramValue.replace("\\", "/");
+					}
+				}
+
+				String data = String.format("%s.%s=%s", uuid, paramName, paramValue);
+				WriteFileBuffer.write(data);
+				WriteFileBuffer.write(System.lineSeparator());
+			}
+			// write specific configuration line
+			WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
+			WriteFileBuffer.write(String.format("%s.meaningfulName=%s\n", uuid, actionMeaningful));
+
+			WriteFileBuffer.close();
+		} finally {
+
+			log.info(String.format("File [%s] is updated", fileName));
+		}
+	}
+
+	/**
+	 * save properties for checkboxes
+	 * @param filePath
+	 * @param fileName
+	 * @param uuid
+	 * @param isDisabled
+	 * @throws IOException
+	 */
+	public void savePropertiesFile(String filePath, String fileName, UUID uuid, String isDisabled) throws IOException {
+		try {
+			filePath = rootXMLFolder + "\\" + filePath;
+			checkDirectoryExists(filePath);
+
+			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
+			Boolean checkBox = !Boolean.valueOf(isDisabled);
+			// write specific configuration line
+			WriteFileBuffer.write(String.format("%s.jsystem.isdisabled=%s\n", uuid, checkBox.toString()));
+			WriteFileBuffer.close();
+		} finally {
+			log.info(String.format("File [%s] is updated", fileName));
+		}
+	}
+
+	/**
+	 * update properties files with appropriate data for specific uuid
+	 * @param filePath
+	 * @param fileName
+	 * @param uuid
+	 * @throws IOException
+	 */
+	public void savePropertiesFile(String filePath, String fileName, UUID uuid) throws IOException {
+		try {
+			filePath = rootXMLFolder + "\\" + filePath;
+			checkDirectoryExists(filePath);
+
+			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
+			// write specific configuration line
+
+			if (!loopData.isEmpty()) {
+				WriteFileBuffer.write(String.format("%s.list=%s\n", uuid, loopData.get(1)));
+				WriteFileBuffer.write(String.format("%s.loop\\ value=%s\n", uuid, loopData.get(0)));
+				WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
+			}
+
+			WriteFileBuffer.close();
+		} finally {
+			log.info(String.format("Properties file [%s] is updated", fileName));
+		}
 	}
 
 	/**
@@ -282,54 +434,6 @@ public class Main {
 		saveFile(rootClassFolder + folderPath, actionNameOriginal + ".java", data);
 	}
 
-	public void checkDirectoryExists(String path) throws IOException {
-		Path dirPath = Paths.get(path);
-		boolean dirExists;
-		dirExists = Files.exists(dirPath);
-		if (!dirExists) {
-			Files.createDirectories(dirPath);
-			log.info(String.format("Folder: %s was created successfully", folderPath));
-		}
-	}
-
-	/**
-	 * save data into Class file
-	 * @param fileName
-	 * @param data
-	 * @throws IOException
-	 */
-	public void saveFile(String Folder,  String fileName, String data) throws IOException {
-		try {
-			boolean checkFileExists;
-			// create a directory if not exists
-			checkDirectoryExists(Folder);
-			// check if that file is already exists
-			checkFileExists = checkFileExists(Folder+fileName);
-
-			// next is to write file into this directory
-			if (checkFileExists) {
-				fileName = "_" + fileName;
-			}
-			FileWriter fw = new FileWriter(Folder + "\\" + fileName);
-			BufferedWriter WriteFileBuffer = new BufferedWriter(fw);
-			WriteFileBuffer.write(data);
-			WriteFileBuffer.close();
-		} finally {
-			// make cleanup global variables
-			folderPath = "";
-			packagePath = "";
-			log.info(String.format("File %s saved successfully", fileName));
-		}
-	}
-
-	public boolean checkFileExists(String fileName) {
-		Path file = Paths.get(fileName);
-		if (Files.exists(file)) {
-			return true;
-		}
-		return false;
-	}
-
 	/**
 	 * xml recursion parser
 	 * @param node
@@ -474,7 +578,7 @@ public class Main {
 						savePropertiesFile(testCase + "\\", testStep + ".properties", uuidForAction, childNode.getTextContent());
 					}
 					if (childNode.getParentNode().getNodeName().equals("KeyBlockGroup")) {
-						generateJSystemScenario(testCase + "\\", testStep, uuidWithActions, true);
+						generateJSystemWorkflow(testCase + "\\", testStep, uuidWithActions, true);
 						uuidWithActions.clear();
 						loopData.clear();
 					}
@@ -487,7 +591,7 @@ public class Main {
 						// save scenario name
 						fatherXmlOfTestCases.add(uuidScenarioName);
 
-						generateJSystemScenario(testCase + "\\", testCase, testCaseStepsList, false);
+						generateJSystemWorkflow(testCase + "\\", testCase, testCaseStepsList, false);
 						testCaseStepsList.clear();
 					}
 					break;
@@ -496,7 +600,15 @@ public class Main {
 		}
 	}
 
-	public void generateJSystemScenario(String filePath, String fileName, ArrayList<ArrayList<String>> actionsWithUUID, boolean scenarioWithActions) throws Exception {
+	/**
+	 * method take params and create xml workflow files for test cases and test steps with actions
+	 * @param filePath
+	 * @param fileName
+	 * @param actionsWithUUID
+	 * @param scenarioWithActions
+	 * @throws Exception
+	 */
+	public void generateJSystemWorkflow(String filePath, String fileName, ArrayList<ArrayList<String>> actionsWithUUID, boolean scenarioWithActions) throws Exception {
 		// xml file header
 		String data =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -574,105 +686,7 @@ public class Main {
 		saveFile(filePath, fileName + ".xml", data);
 	}
 
-	/**
-	 * Append properties files with uuid:param={value}
-	 * @param filePath
-	 * @param fileName
-	 * @param uuid
-	 * @param paramListWithValues
-	 * @throws IOException
-	 */
-	public void savePropertiesFile(String filePath, String fileName, UUID uuid, HashMap<String, String> paramListWithValues) throws IOException {
-		try {
-			filePath = rootXMLFolder + "\\" + filePath;
-			checkDirectoryExists(filePath);
-
-			if (actionMeaningful.equals("default")) {
-				actionMeaningful = actionName;
-			}
-
-			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
-			// iterate hashmap and write lines like: uuid.paramName=param_value
-			for (Map.Entry<String, String> entry : paramListWithValues.entrySet()) {
-				String paramName = entry.getKey();
-				String paramValue = entry.getValue();
-
-				// rspecial rules should be applied for param values
-				paramValue = paramValue.replace("$${SMP1.Host}", "${sut:R_SMP1/connectDetails/iP}");
-				paramValue = paramValue.replace("$${NE1.Host}", "${sut:R_NE1/connectDetails/iP}");
-				paramValue = paramValue.replace("$${", "${run:");
-				if (paramValue.contains("..\\..\\tests\\SMP\\")) {
-					// all specific test data files should be under test_suite/data folder
-					paramValue = paramValue.replace("..\\..\\tests\\SMP\\", "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "data/");
-					if (paramValue.contains("/")) {
-						paramValue = paramValue.replace("\\", "/");
-					}
-				}
-
-				String data = String.format("%s.%s=%s", uuid, paramName, paramValue);
-				WriteFileBuffer.write(data);
-				WriteFileBuffer.write(System.lineSeparator());
-			}
-			// write specific configuration line
-			WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
-			WriteFileBuffer.write(String.format("%s.meaningfulName=%s\n", uuid, actionMeaningful));
-
-			WriteFileBuffer.close();
-		} finally {
-
-			log.info(String.format("File [%s] is updated", fileName));
-		}
-	}
-
-	//for checkboxes
-	public void savePropertiesFile(String filePath, String fileName, UUID uuid, String isDisabled) throws IOException {
-		try {
-			filePath = rootXMLFolder + "\\" + filePath;
-			checkDirectoryExists(filePath);
-
-			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
-			Boolean checkBox = !Boolean.valueOf(isDisabled);
-			// write specific configuration line
-			WriteFileBuffer.write(String.format("%s.jsystem.isdisabled=%s\n", uuid, checkBox.toString()));
-			WriteFileBuffer.close();
-		} finally {
-			log.info(String.format("File [%s] is updated", fileName));
-		}
-	}
-
-
-	// update properties files with appropriate data for specific uuid
-	public void savePropertiesFile(String filePath, String fileName, UUID uuid) throws IOException {
-		try {
-			filePath = rootXMLFolder + "\\" + filePath;
-			checkDirectoryExists(filePath);
-
-			BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
-			// write specific configuration line
-
-			if (!loopData.isEmpty()) {
-				WriteFileBuffer.write(String.format("%s.list=%s\n", uuid, loopData.get(1)));
-				WriteFileBuffer.write(String.format("%s.loop\\ value=%s\n", uuid, loopData.get(0)));
-				WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
-			}
-
-			WriteFileBuffer.close();
-		} finally {
-			log.info(String.format("Properties file [%s] is updated", fileName));
-		}
-	}
-
-	public void generatePathsForActionsMap(String fileName) throws Exception {
-		// get node package path (eg: folder structure) -> and put packagePath
-		Document xmlHierarchyDocument = getParserObject(fileName);
-		// take the correct path for KB actions from preferences.xml
-		getPackageName(xmlHierarchyDocument);
-
-	}
-
-
-
-	public void generateJSystemWorkflowScenario(String filePath, String fileName, ArrayList<ArrayList<String>> actionsWithUUID) throws Exception {
+	public void generateJSystemFatherWorkflow(String filePath, String fileName, ArrayList<ArrayList<String>> actionsWithUUID) throws Exception {
 		// xml file header
 		String data =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!--This file was auto-generated by Aliaksandr Bahdanovich auto-gen script for JSystem runner, " +
@@ -681,7 +695,6 @@ public class Main {
 
 		filePath = rootXMLFolder + "\\" + filePath;
 
-
 		// steps ordering
 		for (int i = 0; i < actionsWithUUID.size(); i++) {
 			data += String.format("\t\t<antcallback target=\"t%s\"/>\r\n", i);
@@ -689,12 +702,7 @@ public class Main {
 
 		data += "\t</target>\r\n";
 
-		/*
-		 * step description:
-		 * actionsWithUUID.get(i).get(0) = UUID
-		 * actionsWithUUID.get(i).get(1) = Action name or <Step name> from old KB system
-		 */
-		// we generate XML file with references to XML files with JSystem Actions
+		// actionsWithUUID[UUID, actionName]
 		for (int i = 0; i < actionsWithUUID.size(); i++) {
 			data += String.format(
 					"\t<target name=\"t%s\">\n" +
@@ -705,13 +713,18 @@ public class Main {
 							"\t\t</jsystem-ant>\n" +
 							"\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0));
 		}
-
 		// xml file last line
 		data += XML_FOOTER;
 
 		// save xml header and write data into file. filename = step name
 		saveFile(filePath, fileName + ".xml", data);
 
+	}
+
+	public void generatePathsForActionsMap(String fileName) throws Exception {
+		Document xmlHierarchyDocument = getParserObject(fileName);
+		// take the correct path for KB actions from preferences.xml
+		getPackageName(xmlHierarchyDocument);
 	}
 
 	public void copyDirectoryWithFilesFromTo(String scrDir,String destinationDir){
@@ -725,26 +738,25 @@ public class Main {
 		}
 	}
 
-
-	/**
-	 * main method for ActionClassGenerator
-	 * @param args
-	 * @throws IOException
-	 */
 	public static void main(String[] args) throws Exception, DirectoryIteratorException {
 		Main xmlParser = new Main();
+
+		// leave as 'false' to work with workflow
 		boolean buildClass = false;
 
 		log.info("Script converter is started");
-		// cleanup
+
+		log.info("Cleanup directory: " + workflowPath);
 		FileUtils.deleteDirectory(new File(workflowPath));
+
+		log.info("Cleanup directory: C:/JAutomationPackage/");
 		FileUtils.deleteDirectory(new File("C:/JAutomationPackage/"));
 
-		//run
+		log.info("CalL: generatePathsForActionsMap");
 		xmlParser.generatePathsForActionsMap(packageFileName);
 
 		if (buildClass) {
-			log.info("--------------------------");
+			log.info("");
 			log.info("CLASS GENERATOR is started");
 			//get the list of xml files and pass one by one into cycle
 			try (BufferedReader br = new BufferedReader(new FileReader(xmlKBActions))) {
@@ -758,16 +770,17 @@ public class Main {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			log.info("");
 		}
 
 		// please uncomment this section to call class or workflow generator
-		log.info("--------------------------");
+		log.info("");
 		log.info("XML WORKFLOW GENERATOR is started");
 		Document xmlWorkFlowDocument = xmlParser.getParserObject(workFlowFileName);
 		xmlParser.parseKBWorkflow(xmlWorkFlowDocument);
 
-		//generate father PCRF_basic
-		xmlParser.generateJSystemWorkflowScenario( "", workflowPath, xmlParser.fatherXmlOfTestCases);
+		log.info("generate father PCRF_basic");
+		xmlParser.generateJSystemFatherWorkflow( "", workflowPath, xmlParser.fatherXmlOfTestCases);
 
 		// copy folders
 		Thread.sleep(2000);
@@ -777,5 +790,6 @@ public class Main {
 		Thread.sleep(2000);
 		xmlParser.copyDirectoryWithFilesFromTo(workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "PCRF_Basic/"); //"scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
 		log.info("Well done!");
+		log.info("");
 	}
 }
