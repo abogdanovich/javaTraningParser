@@ -24,11 +24,26 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
     public final ArrayList<ArrayList<String>> fatherXmlOfTestCases = new ArrayList<>();
     private final ArrayList<String> loopData = new ArrayList<>();
 
+
+
+    //variable for creating properties of father xml
+    public HashMap<String, HashMap<String,ArrayList<String>>> mapTestScenarioMapTestStepsPropertiesFatherXML = new HashMap<>();
+    private ArrayList <String> listUuidOfActionsForPropertiesOfFatherXML = new ArrayList<>();
+    private HashMap <String, ArrayList<String>> mapUuidStepListUuidActionsPropertiesFatherXML = new HashMap<>();
+
+    //variable for creating properties of test scenarios
+    private ArrayList<HashMap<String,ArrayList<String>>> listOfDisabledTestStepsPropertiesOfTestCase = new ArrayList<HashMap<String,ArrayList<String>>>();
+    private ArrayList <String> listUuidOfActionsForPropertiesOfTestCase = new ArrayList<>();
+    private HashMap <String, ArrayList<String>> mapUuidStepListUuidActionsPropertiesTestCase = new HashMap<>();
+
     private UUID uuidForAction = UUID.randomUUID();
 
+    private String uuidTestStep= "";
     private String actionMeaningful = "";
     private String testCase = "";
     private String testStep = "";
+    private String runStateOfTestStep ="";
+    private String runStateOfTestCase ="";
 
     private static final String XML_FOOTER = "</project>";
     private static final String XML_HEADER =
@@ -168,6 +183,9 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                     // jsystem test case
                     testCase = childNode.getTextContent();
                     testCase = testCase.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+
+                    setRunStateOfTestCase(childNode);
+
                     break;
 
                 // STEP NAME
@@ -177,10 +195,20 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                     testStep = testStep.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
                     ArrayList<String> uuidStepName = new ArrayList<String>();
 
-                    uuidStepName.add(UUID.randomUUID().toString());
+                    uuidTestStep = UUID.randomUUID().toString();
+
+                    uuidStepName.add(uuidTestStep);
                     uuidStepName.add(testStep);
                     // save step name
                     testCaseStepsList.add(uuidStepName);
+
+                    //find test step, which is disabled
+                    listUuidOfActionsForPropertiesOfTestCase = new ArrayList<>();
+                    setRunStateOfTestStep(childNode);
+
+                    //update list of action for properties father xml
+                    listUuidOfActionsForPropertiesOfFatherXML = new ArrayList<>();
+
                     break;
 
                 case "keyBlockDisplayName":
@@ -197,6 +225,17 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                     uuidRecord.add(uuidForAction.toString());
                     uuidRecord.add(actionName);
                     uuidWithActions.add(uuidRecord);
+
+                    //if this test STEP is disabled, fill list of his actions
+                    if(runStateOfTestStep.equals("false")) {
+                        listUuidOfActionsForPropertiesOfTestCase.add(uuidForAction.toString());
+                    }
+
+                    //if this test CASE is disabled, fill list of his actions
+                    if(runStateOfTestCase.equals("false")) {
+                        listUuidOfActionsForPropertiesOfFatherXML.add(uuidForAction.toString());
+                        mapUuidStepListUuidActionsPropertiesFatherXML.put(uuidTestStep, listUuidOfActionsForPropertiesOfFatherXML);
+                    }
                     break;
 
                 // params with values
@@ -255,6 +294,16 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                         generateJSystemWorkflow(testCase + "\\", testStep, uuidWithActions, true);
                         uuidWithActions.clear();
                         loopData.clear();
+
+                        //fill list: hashMaps: key: uuid of test step; value: list of uuid's test actions
+                        if(!listUuidOfActionsForPropertiesOfTestCase.isEmpty()){
+                            mapUuidStepListUuidActionsPropertiesTestCase.put(uuidTestStep , listUuidOfActionsForPropertiesOfTestCase);
+                            listOfDisabledTestStepsPropertiesOfTestCase.add(mapUuidStepListUuidActionsPropertiesTestCase);
+                        }
+                        listUuidOfActionsForPropertiesOfTestCase = new ArrayList<>();
+                        mapUuidStepListUuidActionsPropertiesTestCase = new HashMap<>();
+
+
                     }
                     if (childNode.getParentNode().getNodeName().equals("KeyBlockScenario")) {
                         // new scenario - so we can save our prepared xml file
@@ -264,6 +313,18 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                         uuidScenarioName.add(testCase);
                         // save scenario name
                         fatherXmlOfTestCases.add(uuidScenarioName);
+
+                        //if this test case has steps, which are disabled, then create for it properties
+                        if(listOfDisabledTestStepsPropertiesOfTestCase.size()>0){
+                            savePropertiesFileForTestScenarios(testCase + "\\",testCase, listOfDisabledTestStepsPropertiesOfTestCase);
+                        }
+                        listOfDisabledTestStepsPropertiesOfTestCase =new ArrayList<>();
+
+                        //if this test case is disabled, then put it uuid to hashMap
+                        if(runStateOfTestCase.equals("false")) {
+                            mapTestScenarioMapTestStepsPropertiesFatherXML.put(uuidForFatherXML.toString(), mapUuidStepListUuidActionsPropertiesFatherXML);
+                            mapUuidStepListUuidActionsPropertiesFatherXML= new HashMap<>();
+                        }
 
                         generateJSystemWorkflow(testCase + "\\", testCase, testCaseStepsList, false);
                         testCaseStepsList.clear();
@@ -393,5 +454,122 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
 
         // save xml header and write data into file. filename = step name
         saveFile(filePath, fileName + ".xml", data.toString());
+    }
+
+    /**
+     * method take params and create properties for test steps
+     * @param filePath
+     * @param fileName
+     * @param uuidTS
+     * @throws Exception
+     */
+    public void savePropertiesFileForTestScenarios(String filePath, String fileName, ArrayList<HashMap<String,ArrayList<String>>> uuidTS) throws IOException {
+        try {
+            filePath = rootXMLFolder + "\\" + filePath;
+            checkDirectoryExists(filePath);
+
+            BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName+".properties", true));
+
+            // write specific configuration line
+            for (HashMap<String,ArrayList<String>> hashMap: uuidTS) {
+                hashMap.keySet().stream().forEach(uuidOfStep->{
+                    hashMap.get(uuidOfStep).stream().forEach(uuidOfActionOfThisStep->{
+                        try {
+                            WriteFileBuffer.write(String.format("%s.%s.jsystem.isdisabled=%s\n", uuidOfStep, uuidOfActionOfThisStep, true));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    try {
+                        WriteFileBuffer.write(String.format("%s.jsystem.hidden.in.html=%s\n", uuidOfStep, "false"));
+                        WriteFileBuffer.write(String.format("%s.jsystem.jsystem.known.issue=%s\n", uuidOfStep, "false"));
+                        WriteFileBuffer.write(String.format("%s.jsystem.negative.test=%s\n", uuidOfStep, "false"));
+                    }
+                        catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                );
+            }
+
+            WriteFileBuffer.write(String.format("jsystem.hidden.in.html=false\n" +
+                    "jsystem.known.issue=false\n" +
+                    "jsystem.negative.test=false"));
+
+            WriteFileBuffer.close();
+        } finally {
+            log.info(String.format("File [%s] is updated", fileName));
+        }
+    }
+
+    public void savePropertiesFileForFatherXML(String filePath, String fileName, HashMap<String, HashMap<String,ArrayList<String>>> uuidTS) throws IOException {
+        try {
+            filePath = rootXMLFolder + "\\" + filePath;
+            checkDirectoryExists(filePath);
+
+            BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName+".properties", true));
+
+            // write specific configuration line
+            uuidTS.keySet().stream().forEach(uuidOfTestCase->{
+                uuidTS.get(uuidOfTestCase).keySet().stream().forEach(uuidOfTestStep->{
+                    uuidTS.get(uuidOfTestCase).get(uuidOfTestStep).stream().forEach(uuidOfActions->{
+                        try {
+                            WriteFileBuffer.write(String.format("%s.%s.%s.jsystem.isdisabled=%s\n", uuidOfTestCase, uuidOfTestStep, uuidOfActions, true));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    try {
+                        WriteFileBuffer.write(String.format("%s.%s.jsystem.hidden.in.html=%s\n",uuidOfTestCase, uuidOfTestStep, "false"));
+                        WriteFileBuffer.write(String.format("%s.%s.jsystem.known.issue=%s\n",uuidOfTestCase, uuidOfTestStep, "false"));
+                        WriteFileBuffer.write(String.format("%s.%s.jsystem.isdisabled=%s\n", uuidOfTestCase,uuidOfTestStep, "false"));
+                        WriteFileBuffer.write(String.format("%s.%s.jsystem.negative.test=%s\n", uuidOfTestCase,uuidOfTestStep, "false"));
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+                try {
+                    WriteFileBuffer.write(String.format("%s.jsystem.hidden.in.html=%s\n", uuidOfTestCase, "false"));
+                    WriteFileBuffer.write(String.format("%s.jsystem.known.issue=%s\n", uuidOfTestCase, "false"));
+                    WriteFileBuffer.write(String.format("%s.jsystem.isdisabled=%s\n", uuidOfTestCase, "false"));
+                    WriteFileBuffer.write(String.format("%s.jsystem.negative.test=%s\n", uuidOfTestCase, "false"));
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            WriteFileBuffer.write(String.format("jsystem.hidden.in.html=false\n" +
+                    "jsystem.known.issue=false\n" +
+                    "jsystem.negative.test=false"));
+
+            WriteFileBuffer.close();
+        } finally {
+            log.info(String.format("File [%s] is updated", fileName));
+        }
+    }
+
+
+    private void setRunStateOfTestStep(Node childNode) {
+        runStateOfTestStep ="";
+        Node elementKeyBlockGroup = childNode.getParentNode();
+        for(int t=0;t<elementKeyBlockGroup.getChildNodes().getLength();t++) {
+            if(elementKeyBlockGroup.getChildNodes().item(t).getNodeName().equals("runState")){
+                runStateOfTestStep = elementKeyBlockGroup.getChildNodes().item(t).getTextContent();
+                break;
+            }
+        }
+    }
+
+    private void setRunStateOfTestCase(Node childNode) {
+        runStateOfTestCase ="";
+        Node elementKeyBlockScenario = childNode.getParentNode();
+        for(int t=0;t<elementKeyBlockScenario.getChildNodes().getLength();t++) {
+            if(elementKeyBlockScenario.getChildNodes().item(t).getNodeName().equals("runState")){
+                runStateOfTestCase = elementKeyBlockScenario.getChildNodes().item(t).getTextContent();
+                break;
+            }
+        }
     }
 }
