@@ -269,6 +269,30 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                         testCaseStepsList.clear();
                     }
                     break;
+                case "additionalParamsTable":
+                    // workflow AddAdditionalParameters.xml with Action: AddAdditionalParameters
+                    Element additionalParamsTable = (Element) childNode;
+                    ArrayList<String> additionalParamsTableData = new ArrayList<>();
+                    String paramValue = "";
+
+                    log.debug("");
+                    log.debug("additionalParamsTable");
+
+                    for (int h = 0; h < additionalParamsTable.getElementsByTagName("string").getLength(); h++) {
+                        // param string - param value string
+                        paramValue = additionalParamsTable.getElementsByTagName("string").item(h).getTextContent();
+                        if (paramValue.contains("###")) {
+                            String[] split = paramValue.split("###");
+                            additionalParamsTableData.add(split[1]);
+                        } else {
+                            additionalParamsTableData.add(paramValue);
+                        }
+                        log.debug(additionalParamsTableData);
+                    }
+
+                    log.debug("");
+                    break;
+
             }
             parseKBWorkflow(childNode);
         }
