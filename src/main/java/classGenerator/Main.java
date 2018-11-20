@@ -62,6 +62,7 @@ public class Main {
 
         log.info("generate father PCRF_basic");
         xmlAndPropertiesGenerator.generateJSystemFatherWorkflow( "", workflowPath, xmlAndPropertiesGenerator.fatherXmlOfTestCases);
+        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML("",workflowPath,xmlAndPropertiesGenerator.mapTestScenarioMapTestStepsPropertiesFatherXML);
 
         // copy folders
         Thread.sleep(2000);
