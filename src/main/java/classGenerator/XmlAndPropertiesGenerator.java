@@ -78,7 +78,7 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                 paramValue = paramValue.replace("$${", "${run:");
                 if (paramValue.contains("..\\..\\tests\\SMP\\")) {
                     // all specific test data files should be under test_suite/data folder
-                    paramValue = paramValue.replace("..\\..\\tests\\SMP\\", "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "PCRF_Basic/data/");
+                    paramValue = paramValue.replace("..\\..\\tests\\SMP\\", "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "/" + workflowPath + "/data/");
                     if (paramValue.contains("/")) {
                         paramValue = paramValue.replace("\\", "/");
                     }
