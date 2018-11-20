@@ -159,16 +159,18 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
 
             String data = String.format("%s.AdditionalParamters=automation.allot.com.Products.GlobalVariable;\\#Tue Nov 20 15\\:58\\:11 MSK 2018\\r\\n", uuid);
 
-            for (int i = 0; i < params.size(); i+=3) {
-                // name - description - value array
-                data += String.format("%s.ParamterName\\=%s\\r\\n%s.ParamterDescreption\\=%s\\r\\n%s.ParamterValue\\=%s\\r\\n%s.ParamterType\\=String\\r\\n", i, params.get(i), i, params.get(i+1), i, params.get(i+1), i);
-
+            for (int k = 0; k < params.size() / 3; k++) {
+                for (int i = (k * 3); i < (k * 3) + 3; i += 3) {
+                    // name - description - value array
+                    data += String.format("%s.ParamterName\\=%s\\r\\n%s.ParamterDescreption\\=%s\\r\\n%s.ParamterValue\\=%s\\r\\n%s.ParamterType\\=String\\r\\n", k, params.get(i), k, params.get(i + 1), k, params.get(i + 2), k);
+                }
             }
-            
+
             WriteFileBuffer.write(data);
             WriteFileBuffer.write(System.lineSeparator());
 
             // write specific configuration line
+            WriteFileBuffer.write(String.format("%s.EvaluateMathExpression=false\n", uuid));
             WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
             WriteFileBuffer.write(String.format("%s.meaningfulName=AddAdditionalParamaters\n", uuid));
             WriteFileBuffer.write(System.lineSeparator());
@@ -422,6 +424,7 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
     }
 
     // for AddAdditionalParamaters global file
+    // FIXME: add me into father xml
     private void generateJSystemWorkflow(String filePath, String fileName, String uuid) throws Exception {
         // xml file header
         StringBuilder data = new StringBuilder();
@@ -443,7 +446,7 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                 "\t\t\t<sysproperty key=\"jsystem.uuid\" value=\"" + uuid + "\"/>\r\n" +
                 "\t\t\t<sysproperty key=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\r\n" +
                 "\t\t\t<sysproperty key=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\r\n" +
-                "\t\t\t<test name=\"automation.allot.com.Actions.AOS.Others.DeploymentProfile.addAdditionalParameter\"/>\r\n" +
+                "\t\t\t<test name=\"automation.allot.com.Actions.AOS.Others.DeploymentProfile.addAdditionalParameters\"/>\r\n" +
                 "\t\t</jsystem>\r\n" +
                 "\t</target>\r\n");
 
