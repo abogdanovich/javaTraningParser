@@ -57,12 +57,22 @@ public class Main {
         // please uncomment this section to call class or workflow generator
         log.info("");
         log.info("XML WORKFLOW GENERATOR is started");
-        Document xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
+        Document xmlWorkFlowDocument;
+
+        try {
+            xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
+        } catch (IOException e) {
+            log.info("try to replace special symbols");
+            CommonParseActions.removeSpecialSymbols();
+            log.info("try to replace special symbols - success");
+            xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
+        }
+
         xmlAndPropertiesGenerator.parseKBWorkflow(xmlWorkFlowDocument);
 
         log.info("generate father PCRF_basic");
-        xmlAndPropertiesGenerator.generateJSystemFatherWorkflow( "", workflowPath, xmlAndPropertiesGenerator.fatherXmlOfTestCases);
-        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML("",workflowPath,xmlAndPropertiesGenerator.mapTestScenarioMapTestStepsPropertiesFatherXML);
+        xmlAndPropertiesGenerator.generateJSystemFatherWorkflow("", workflowPath, xmlAndPropertiesGenerator.fatherXmlOfTestCases);
+        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML("", workflowPath, xmlAndPropertiesGenerator.mapTestScenarioMapTestStepsPropertiesFatherXML);
 
         // copy folders
         Thread.sleep(2000);

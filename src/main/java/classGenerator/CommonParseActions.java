@@ -7,10 +7,7 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -141,5 +138,29 @@ public abstract class CommonParseActions {
             packagePath = "";
             log.info(String.format("File %s saved successfully", fileName));
         }
+    }
+
+    /**
+     * update input file for special symbols
+     * @throws IOException
+     */
+    public static void removeSpecialSymbols() throws IOException {
+
+        FileWriter fw = new FileWriter(workflowPath+"_new.xml");
+        BufferedWriter WriteFileBuffer = new BufferedWriter(fw);
+        String data = "";
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(workflowPath+".xml"), "Cp1252"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                data = line.replaceAll("([\u2022\u2013\u2014])","");
+                WriteFileBuffer.write(data+"\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        WriteFileBuffer.close();
+        FileUtils.deleteQuietly(new File(workflowPath+".xml"));
+        new File(workflowPath+"_new.xml").renameTo(new File(workflowPath + ".xml"));
     }
 }
