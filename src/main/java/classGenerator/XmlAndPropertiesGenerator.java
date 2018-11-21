@@ -90,8 +90,16 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                 // rspecial rules should be applied for param values
                 paramValue = paramValue.replace("$${SMP1.Host}", "${sut:R_SMP1/connectDetails/iP}");
                 paramValue = paramValue.replace("$${NE1.Host}", "${sut:R_NE1/connectDetails/iP}");
-                //paramValue = paramValue.replace("$${", "${run:");
-                paramValue = paramValue.replace("$${", "${");
+
+                // variable rule converting
+                if (paramValue.contains("$${")) {
+                    if (paramValue.contains("SP$${")) {
+                        paramValue = paramValue.replace("SP$${", "SP${");
+                    } else {
+                        paramValue = paramValue.replace("$${", "${run:");
+                    }
+                }
+
                 if (paramValue.contains("..\\..\\tests\\SMP\\")) {
                     // all specific test data files should be under test_suite/data folder
                     paramValue = paramValue.replace("..\\..\\tests\\SMP\\", "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath  + workflowPath + "/data/");
