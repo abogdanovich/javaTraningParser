@@ -13,18 +13,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class XmlAndPropertiesGenerator extends CommonParseActions{
+public class XmlAndPropertiesGenerator extends CommonParseActions implements Properties{
     private static final Logger log = Logger.getLogger(XmlAndPropertiesGenerator.class);
 
-    private static final String rootXMLFolder = workflowPath;
+    private static String rootXMLFolder;
+
     private static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
     private final HashMap<String, String> paramListWithValues = new HashMap<>();
     private final ArrayList<ArrayList<String>> uuidWithActions = new ArrayList<>();
     private final ArrayList<ArrayList<String>> testCaseStepsList = new ArrayList<>();
     public final ArrayList<ArrayList<String>> fatherXmlOfTestCases = new ArrayList<>();
     private final ArrayList<String> loopData = new ArrayList<>();
-
-
 
     //variable for creating properties of father xml
     public HashMap<String, HashMap<String,ArrayList<String>>> mapTestScenarioMapTestStepsPropertiesFatherXML = new HashMap<>();
@@ -63,6 +62,10 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                     "\t<taskdef classname=\"com.aqua.anttask.jsystem.JSystemSetAntProperties\" name=\"jsystemsetantproperties\"/>\r\n" +
                     "\t<target name=\"execute scenario\">\n";
 
+    public XmlAndPropertiesGenerator(String workflowPath) {
+        this.workflowPath = workflowPath;
+        this.rootXMLFolder = workflowPath;
+    }
 
     /**
      * Append properties files with uuid:param={value}
