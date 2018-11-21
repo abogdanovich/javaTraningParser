@@ -16,8 +16,6 @@ import java.util.UUID;
 public class XmlAndPropertiesGenerator extends CommonParseActions{
     private static final Logger log = Logger.getLogger(XmlAndPropertiesGenerator.class);
 
-    private static String rootXMLFolder;
-
     private static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
     private final HashMap<String, String> paramListWithValues = new HashMap<>();
     private final ArrayList<ArrayList<String>> uuidWithActions = new ArrayList<>();
@@ -64,7 +62,7 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
 
     public XmlAndPropertiesGenerator(String workflowPath) {
         this.workflowPath = workflowPath;
-        this.rootXMLFolder = workflowPath;
+        this.rootXMLFolder = "output\\"+workflowPath;
     }
 
     /**

@@ -18,6 +18,7 @@ public abstract class CommonParseActions {
     private static final Logger log = Logger.getLogger(CommonParseActions.class);
 
     public static String workflowPath = "";
+    public static String rootXMLFolder = "";
 
     public static final HashMap<String, String> pathsToActionsMap = new HashMap<>();
     public static String rootClassFolder = "";

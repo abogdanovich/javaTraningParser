@@ -14,7 +14,7 @@ public class Main {
 
     // change for every feature run
     static final String workflowPath = "PCRF_Other";
-    static final String kbPath = "d:\\allot\\testFRAMEWORK\\oldKB\\";
+    static final String kbPath = "d:\\KB\\";
     static final String xmlKBFiles = kbPath + "trunk\\SW\\bin\\res\\xml\\";
 
     static final String workFlowFileName = workflowPath + ".xml";
@@ -81,11 +81,11 @@ public class Main {
 
         // copy workflow folders
         Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\" + workflowPath, workflowPath + "\\data\\" + workflowPath);
+        CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\" + workflowPath, "output\\"+workflowPath + "\\data\\" + workflowPath);
         Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
+        //CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
         Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo(workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + workflowPath);
+        CommonParseActions.copyDirectoryWithFilesFromTo("output\\"+workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + workflowPath);
         log.info("Well done!");
         log.info("");
     }

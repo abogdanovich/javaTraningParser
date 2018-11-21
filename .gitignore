@@ -6,4 +6,6 @@ target
 log.log
 smp_actions.txt
 *.xml
-PCRF*
+output
+*.iml
+!pom.xml
