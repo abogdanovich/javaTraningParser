@@ -149,6 +149,14 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
         }
     }
 
+    /**
+     * save properties file for global params
+     * @param filePath
+     * @param fileName
+     * @param uuid
+     * @param params
+     * @throws IOException
+     */
     private void savePropertiesFile(String filePath, String fileName, UUID uuid, ArrayList<String> params) throws IOException {
         try {
             filePath = rootXMLFolder + "\\" + filePath;
@@ -172,7 +180,7 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
             // write specific configuration line
             WriteFileBuffer.write(String.format("%s.EvaluateMathExpression=false\n", uuid));
             WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
-            WriteFileBuffer.write(String.format("%s.meaningfulName=AddAdditionalParamaters\n", uuid));
+            WriteFileBuffer.write(String.format("%s.meaningfulName=Global Parameters\n", uuid));
             WriteFileBuffer.write(System.lineSeparator());
 
             WriteFileBuffer.close();
@@ -180,7 +188,6 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
             log.info(String.format("Properties file [%s] is updated", fileName));
         }
     }
-
 
     /**
      * generate XML workflow from KB xml file
@@ -323,11 +330,10 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
                             additionalParamsTableData.add(paramValue);
                         }
                     }
-                    // save global params
+                    // save global params as workflow
                     generateJSystemWorkflow("AddAdditionalParamaters\\", "AddAdditionalParamaters", addUUIDParamaters.toString());
                     // save properties file for global param
                     savePropertiesFile("AddAdditionalParamaters" + "\\", "AddAdditionalParamaters.properties", addUUIDParamaters, additionalParamsTableData);
-                    log.debug("uuidWithAdditionalActions: " + additionalParamsTableData);
 
                     break;
 
@@ -423,8 +429,13 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
         saveFile(filePath, fileName + ".xml", data.toString());
     }
 
-    // for AddAdditionalParamaters global file
-    // FIXME: add me into father xml
+    /**
+     * xml for AddAdditionalParamaters global workflow
+     * @param filePath
+     * @param fileName
+     * @param uuid
+     * @throws Exception
+     */
     private void generateJSystemWorkflow(String filePath, String fileName, String uuid) throws Exception {
         // xml file header
         StringBuilder data = new StringBuilder();
@@ -466,23 +477,36 @@ public class XmlAndPropertiesGenerator extends CommonParseActions{
 
         filePath = rootXMLFolder + "\\" + filePath;
 
-        // steps ordering
+        // add global params
+        data.append("\t\t<antcallback target=\"t0\"/>\r\n");
+
+        // steps ordering with shifted i to 1 because of AddAdditionalParamaters = 0
         for (int i = 0; i < actionsWithUUID.size(); i++) {
-            data.append(String.format("\t\t<antcallback target=\"t%s\"/>\r\n", i));
+            data.append(String.format("\t\t<antcallback target=\"t%s\"/>\r\n", i+1));
         }
 
         data.append("\t</target>\r\n");
 
-        // actionsWithUUID[UUID, actionName]
+        // add manually AddAdditionalParamaters to father workflow
+        data.append(
+                "\t<target name=\"t0\">\n" +
+                "\t\t<jsystem-ant antfile=\"${scenarios.base}/" + smpTestPath + workflowPath + "/AddAdditionalParamaters/AddAdditionalParamaters.xml\">\n" +
+                "\t\t\t<property name=\"jsystem.uuid\" value=\"" + UUID.randomUUID().toString() + "\"/>\n" +
+                "\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
+                "\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
+                "\t\t</jsystem-ant>\n" +
+                "\t</target>");
+
+        // actionsWithUUID[UUID, actionName] with shifted i to 1 because of AddAdditionalParamaters = 0
         for (int i = 0; i < actionsWithUUID.size(); i++) {
             data.append(String.format(
                     "\t<target name=\"t%s\">\n" +
-                            "\t\t<jsystem-ant antfile=\"${scenarios.base}/" + smpTestPath + workflowPath + "/%s/%s.xml\">\n" +
-                            "\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
-                            "\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
-                            "\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
-                            "\t\t</jsystem-ant>\n" +
-                            "\t</target>", i, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0)));
+                    "\t\t<jsystem-ant antfile=\"${scenarios.base}/" + smpTestPath + workflowPath + "/%s/%s.xml\">\n" +
+                    "\t\t\t<property name=\"jsystem.uuid\" value=\"%s\"/>\n" +
+                    "\t\t\t<property name=\"jsystem.parent.uuid\" value=\"${jsystem.parent.uuid}.${jsystem.uuid}\"/>\n" +
+                    "\t\t\t<property name=\"jsystem.parent.name\" value=\"${jsystem.parent.name}.${ant.project.name}\"/>\n" +
+                    "\t\t</jsystem-ant>\n" +
+                    "\t</target>", i+1, actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(1), actionsWithUUID.get(i).get(0)));
         }
         // xml file last line
         data.append(XML_FOOTER);
