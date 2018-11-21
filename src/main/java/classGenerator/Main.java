@@ -13,7 +13,7 @@ public class Main {
     private static final Logger log = Logger.getLogger(Main.class);
 
     // change for every feature run
-    static final String workflowPath = "PCRF_Basic";
+    static final String workflowPath = "PCRF_Other";
     static final String kbPath = "d:\\allot\\testFRAMEWORK\\oldKB\\";
     static final String xmlKBFiles = kbPath + "trunk\\SW\\bin\\res\\xml\\";
 

@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class XmlAndPropertiesGenerator extends CommonParseActions implements Properties{
+public class XmlAndPropertiesGenerator extends CommonParseActions{
     private static final Logger log = Logger.getLogger(XmlAndPropertiesGenerator.class);
 
     private static String rootXMLFolder;
