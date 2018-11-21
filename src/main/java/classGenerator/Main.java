@@ -12,16 +12,21 @@ import java.io.IOException;
 public class Main {
     private static final Logger log = Logger.getLogger(Main.class);
 
-    static final String xmlKBActions = "smp_actions.txt";
-    static final String xmlKBFiles = "d:\\allot\\oldKB\\trunk\\SW\\bin\\res\\xml\\";
+    // change for every feature run
     static final String workflowPath = "PCRF_Basic";
+    static final String kbPath = "d:\\allot\\testFRAMEWORK\\oldKB\\";
+    static final String xmlKBFiles = kbPath + "trunk\\SW\\bin\\res\\xml\\";
+
+    static final String workFlowFileName = workflowPath + ".xml";
+
+    static final String xmlKBActions = "smp_actions.txt";
     static final String packageFileName = "preferences.xml";
-    static final String workFlowFileName = "PCRF_Basic.xml";
+
     static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
 
     public static void main(String[] args) throws Exception {
-        ClassGenerator classGenerator = new ClassGenerator();
-        XmlAndPropertiesGenerator xmlAndPropertiesGenerator = new XmlAndPropertiesGenerator();
+        ClassGenerator classGenerator = new ClassGenerator(workflowPath);
+        XmlAndPropertiesGenerator xmlAndPropertiesGenerator = new XmlAndPropertiesGenerator(workflowPath);
 
         // leave as 'false' to work with workflow
         boolean buildClass = false;
@@ -54,7 +59,7 @@ public class Main {
             }
             log.info("");
         }
-        // please uncomment this section to call class or workflow generator
+
         log.info("");
         log.info("XML WORKFLOW GENERATOR is started");
         Document xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
@@ -64,13 +69,13 @@ public class Main {
         xmlAndPropertiesGenerator.generateJSystemFatherWorkflow( "", workflowPath, xmlAndPropertiesGenerator.fatherXmlOfTestCases);
         xmlAndPropertiesGenerator.savePropertiesFileForFatherXML("",workflowPath,xmlAndPropertiesGenerator.mapTestScenarioMapTestStepsPropertiesFatherXML);
 
-        // copy folders
+        // copy workflow folders
         Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo("d:\\allot\\testFRAMEWORK\\oldKB\\trunk\\tests\\SMP\\PCRF_Basic", workflowPath + "\\data\\PCRF_Basic\\");
+        CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\" + workflowPath, workflowPath + "\\data\\" + workflowPath);
         Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo("d:\\allot\\testFRAMEWORK\\oldKB\\trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
+        CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
         Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo(workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + "PCRF_Basic/"); //"scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
+        CommonParseActions.copyDirectoryWithFilesFromTo(workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + workflowPath);
         log.info("Well done!");
         log.info("");
     }

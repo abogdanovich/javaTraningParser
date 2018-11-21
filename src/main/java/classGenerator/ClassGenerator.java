@@ -15,6 +15,9 @@ public class ClassGenerator extends CommonParseActions {
     private static final ArrayList<String> actionList = new ArrayList<>();
     private static final ArrayList<String> paramList = new ArrayList<>();
 
+    public ClassGenerator(String rootClassFolder) {
+        this.rootClassFolder = rootClassFolder + "_class";
+    }
     /**
      * xml recursion parser
      * @param node

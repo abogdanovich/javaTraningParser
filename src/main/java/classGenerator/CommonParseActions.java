@@ -15,17 +15,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Properties;
 
 public abstract class CommonParseActions {
     private static final Logger log = Logger.getLogger(CommonParseActions.class);
 
+    public static String workflowPath = "";
+
     public static final HashMap<String, String> pathsToActionsMap = new HashMap<>();
-    public static final String workflowPath = "PCRF_Basic";
-    public static final String rootClassFolder = workflowPath + "_class";
+    public static String rootClassFolder = "";
     public static String folderPath = "";
     public static String packagePath = "";
     public String actionName = "";
-
 
     public static void generatePathsForActionsMap(String fileName) throws Exception {
         Document xmlHierarchyDocument = getParserObject(fileName);
