@@ -19,7 +19,7 @@ public class JSystemClassGenerator extends CommonParseActions {
      * @param params
      * @throws IOException
      */
-    public void generateActionClass(String actionName, ArrayList<String> params) throws Exception {
+    public void generateActionClass(String actionName, ArrayList<ArrayList<String>> params) throws Exception {
         StringBuilder data = new StringBuilder();
         String actionNameOriginal = actionName;
         String testMethodName = "";
@@ -37,6 +37,9 @@ public class JSystemClassGenerator extends CommonParseActions {
 
         //get folder path path for action
         folderPath = pathsToActionsMap.get(actionName);
+        if (folderPath == null) {
+            folderPath = "General";
+        }
 
         // remove the last "." symbol
         if (!folderPath.equals("")) {
@@ -68,8 +71,8 @@ public class JSystemClassGenerator extends CommonParseActions {
                         "\t // class variables for the given Action\r\n");
 
         // put here all action params !
-        for (String param : params) {
-            data.append( String.format("\t private String %s = \"\"; \r\n ", param));
+        for (int i = 0; i < params.size(); i++) {
+            data.append( String.format("\t private %s %s = \"\"; \r\n ", params.get(i).get(1), params.get(i).get(0)));
         }
 
         data.append(
@@ -97,9 +100,9 @@ public class JSystemClassGenerator extends CommonParseActions {
         for (int i=0; i < params.size(); i++) {
             if (i == params.size() - 1) {
                 // pass comma into params list except the last element
-                data.append(String.format("\"%s\"", params.get(i)));
+                data.append(String.format("\"%s\"", params.get(i).get(0)));
             } else {
-                data.append(String.format("\"%s\", ", params.get(i)));
+                data.append(String.format("\"%s\", ", params.get(i).get(0)));
             }
         }
 
@@ -112,9 +115,9 @@ public class JSystemClassGenerator extends CommonParseActions {
                         "\t\t List<KBParam> params = new ArrayList<>();\r\n");
 
         // put here all action params !
-        for (String param : params) {
+        for (int i = 0; i < params.size(); i++) {
             data.append(String.format("\t\t params.add(new KBParam(\"%s\", %s, \"text\", \"\", false, false)); \r\n",
-                    param, param));
+                    params.get(i).get(0), params.get(i).get(0)));
         }
 
         data.append(
@@ -135,7 +138,7 @@ public class JSystemClassGenerator extends CommonParseActions {
                         "\t // actions getter\r\n");
 
         // generate all params getters
-        for (String param1 : params) {
+        for (int i = 0; i < params.size(); i++) {
             data.append(String.format(
                     "\r\n" +
                             "\t /**\r\n" +
@@ -145,13 +148,13 @@ public class JSystemClassGenerator extends CommonParseActions {
                             "\t public String get%s() {\r\n" +
                             "\t\t return this.%s;\r\n" +
                             "\t } \r\n"
-                    , param1, param1, param1));
+                    , params.get(i).get(0), params.get(i).get(0), params.get(i).get(0)));
         }
 
         data.append("\t // actions setter\r\n");
 
         // generate all params setters
-        for (String param : params) {
+        for (int i = 0; i < params.size(); i++) {
             data.append(String.format(
                     "\r\n" +
                             "\t /**\r\n" +
@@ -161,8 +164,8 @@ public class JSystemClassGenerator extends CommonParseActions {
                             "\t public void set%s(String %s) {\r\n" +
                             "\t\t this.%s = %s;\r\n" +
                             "\t } \r\n"
-                    , param, param, param,
-                    param, param, param));
+                    , params.get(i).get(0), params.get(i).get(0), params.get(i).get(0),
+                    params.get(i).get(0), params.get(i).get(0), params.get(i).get(0)));
         }
 
         data.append("\r\n }");
