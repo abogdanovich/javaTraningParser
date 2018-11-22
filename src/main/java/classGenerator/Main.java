@@ -1,5 +1,7 @@
 package classGenerator;
 
+import classGenerator.ParserAndGeneratorForClassFiles.ParserForClass;
+import classGenerator.ParserAndGeneratorForXmlAndProperties.ParserForXmlAndProperties;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -25,21 +27,21 @@ public class Main {
     static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
 
     public static void main(String[] args) throws Exception {
-        ClassGenerator classGenerator = new ClassGenerator(workflowPath);
-        XmlAndPropertiesGenerator xmlAndPropertiesGenerator = new XmlAndPropertiesGenerator(workflowPath);
+        ParserForClass classGenerator = new ParserForClass(workflowPath);
+        ParserForXmlAndProperties xmlAndPropertiesGenerator = new ParserForXmlAndProperties(workflowPath);
 
         // leave as 'false' to work with workflow
         boolean buildClass = false;
 
         log.info("Script converter is started");
 
-        log.info("Cleanup directory: " + workflowPath);
-        FileUtils.deleteDirectory(new File(workflowPath));
+        log.info("Cleanup directory: output\\" + workflowPath);
+        FileUtils.deleteDirectory(new File("output\\" + workflowPath));
 
         log.info("Cleanup directory: C:/JAutomationPackage/");
         FileUtils.deleteDirectory(new File("C:/JAutomationPackage/"));
 
-        log.info("CalL: generatePathsForActionsMap");
+        log.info("Call: generatePathsForActionsMap");
         CommonParseActions.generatePathsForActionsMap(packageFileName);
 
         if (buildClass) {
@@ -50,7 +52,7 @@ public class Main {
                 String line;
                 while ((line = br.readLine()) != null) {
                     log.info("Input XML file is : " + line);
-                    Document xmlActionsDocument = classGenerator.getParserObject(xmlKBFiles + line + ".xml");
+                    Document xmlActionsDocument = classGenerator.getParserObject(workFlowFileName);
                     // recursion node review
                     classGenerator.parseKBActions(xmlActionsDocument);
                 }
@@ -76,8 +78,8 @@ public class Main {
         xmlAndPropertiesGenerator.parseKBWorkflow(xmlWorkFlowDocument);
 
         log.info("generate father PCRF_basic");
-        xmlAndPropertiesGenerator.generateJSystemFatherWorkflow("", workflowPath, xmlAndPropertiesGenerator.fatherXmlOfTestCases);
-        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML("", workflowPath, xmlAndPropertiesGenerator.mapTestScenarioMapTestStepsPropertiesFatherXML);
+        xmlAndPropertiesGenerator.generateJSystemFatherWorkflow();
+        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML();
 
         // copy workflow folders
         Thread.sleep(2000);
