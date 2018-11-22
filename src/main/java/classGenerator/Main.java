@@ -15,7 +15,7 @@ public class Main {
     private static final Logger log = Logger.getLogger(Main.class);
 
     // change for every feature run
-    static final String workflowPath = "PCRF_Other";
+    static final String workflowPath = "output\\";
     static final String kbPath = "d:\\KB\\";
     static final String xmlKBFiles = kbPath + "trunk\\SW\\bin\\res\\xml\\";
 
@@ -31,12 +31,12 @@ public class Main {
         ParserForXmlAndProperties xmlAndPropertiesGenerator = new ParserForXmlAndProperties(workflowPath);
 
         // leave as 'false' to work with workflow
-        boolean buildClass = false;
+        boolean buildClass = true;
 
         log.info("Script converter is started");
 
-        log.info("Cleanup directory: output\\" + workflowPath);
-        FileUtils.deleteDirectory(new File("output\\" + workflowPath));
+        log.info("Cleanup directory: output\\");
+        FileUtils.deleteDirectory(new File("output\\"));
 
         log.info("Cleanup directory: C:/JAutomationPackage/");
         FileUtils.deleteDirectory(new File("C:/JAutomationPackage/"));
@@ -52,7 +52,7 @@ public class Main {
                 String line;
                 while ((line = br.readLine()) != null) {
                     log.info("Input XML file is : " + line);
-                    Document xmlActionsDocument = classGenerator.getParserObject(workFlowFileName);
+                    Document xmlActionsDocument = classGenerator.getParserObject(xmlKBFiles + line + ".xml");
                     // recursion node review
                     classGenerator.parseKBActions(xmlActionsDocument);
                 }
@@ -60,35 +60,35 @@ public class Main {
                 e.printStackTrace();
             }
             log.info("");
+        } else {
+            log.info("");
+            log.info("XML WORKFLOW GENERATOR is started");
+            Document xmlWorkFlowDocument;
+
+            try {
+                xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
+            } catch (IOException e) {
+                log.info("try to replace special symbols");
+                CommonParseActions.removeSpecialSymbols(workflowPath);
+                log.info("try to replace special symbols - success");
+                xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
+            }
+
+            xmlAndPropertiesGenerator.parseKBWorkflow(xmlWorkFlowDocument);
+
+            log.info("generate father PCRF_basic");
+            xmlAndPropertiesGenerator.generateJSystemFatherWorkflow();
+            xmlAndPropertiesGenerator.savePropertiesFileForFatherXML();
+
+            // copy workflow folders
+            Thread.sleep(2000);
+            CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\" + workflowPath, "output\\" + workflowPath + "\\data\\" + workflowPath);
+            Thread.sleep(2000);
+            //CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
+            Thread.sleep(2000);
+            CommonParseActions.copyDirectoryWithFilesFromTo("output\\" + workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + workflowPath);
+            log.info("Well done!");
+            log.info("");
         }
-
-        log.info("");
-        log.info("XML WORKFLOW GENERATOR is started");
-        Document xmlWorkFlowDocument;
-
-        try {
-            xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
-        } catch (IOException e) {
-            log.info("try to replace special symbols");
-            CommonParseActions.removeSpecialSymbols(workflowPath);
-            log.info("try to replace special symbols - success");
-            xmlWorkFlowDocument = xmlAndPropertiesGenerator.getParserObject(workFlowFileName);
-        }
-
-        xmlAndPropertiesGenerator.parseKBWorkflow(xmlWorkFlowDocument);
-
-        log.info("generate father PCRF_basic");
-        xmlAndPropertiesGenerator.generateJSystemFatherWorkflow();
-        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML();
-
-        // copy workflow folders
-        Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\" + workflowPath, "output\\"+workflowPath + "\\data\\" + workflowPath);
-        Thread.sleep(2000);
-        //CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
-        Thread.sleep(2000);
-        CommonParseActions.copyDirectoryWithFilesFromTo("output\\"+workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + workflowPath);
-        log.info("Well done!");
-        log.info("");
     }
 }

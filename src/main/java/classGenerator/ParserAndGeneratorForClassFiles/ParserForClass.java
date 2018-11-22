@@ -11,12 +11,13 @@ import java.util.ArrayList;
 public class ParserForClass extends CommonParseActions {
     private static final Logger log = Logger.getLogger(ParserForClass.class);
     private static final ArrayList<String> actionList = new ArrayList<>();
-    private static final ArrayList<String> paramList = new ArrayList<>();
+    private static final ArrayList<ArrayList<String>> paramList = new ArrayList<>();
 
     private JSystemClassGenerator jSystemClassGenerator;
 
     public ParserForClass(String rootClassFolder) {
-        this.rootClassFolder = rootClassFolder + "_class";
+//        this.rootClassFolder = rootClassFolder + "_class";
+        this.rootClassFolder = rootClassFolder;
         this.jSystemClassGenerator = new JSystemClassGenerator();
     }
     /**
@@ -42,9 +43,24 @@ public class ParserForClass extends CommonParseActions {
                     break;
                 case "KeyBlockParam":
                     Element element = (Element) childNode;
+                    ArrayList<String> paramListElement = new ArrayList<>();
                     for (int k = 0; k < element.getElementsByTagName("paramName").getLength(); k++) {
                         // add a new param name
-                        paramList.add(element.getElementsByTagName("paramName").item(k).getTextContent());
+                        paramListElement.add(element.getElementsByTagName("paramName").item(k).getTextContent());
+
+                        switch (element.getElementsByTagName("paramValueType").item(k).getTextContent()) {
+                            case "file":
+                                paramListElement.add("File");
+                                break;
+//                            case "list":
+//                                paramListElement.add("enum");
+//                                break;
+                            default:
+                                paramListElement.add("String");
+                                break;
+                        }
+                        // add param-type into array
+                        paramList.add(paramListElement);
                     }
                     break;
                 case "keyBlockRepeatCount":
