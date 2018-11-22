@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Properties;
 
 public abstract class CommonParseActions {
     private static final Logger log = Logger.getLogger(CommonParseActions.class);
@@ -59,31 +58,22 @@ public abstract class CommonParseActions {
             Node childNode = list.item(i);
             String nodeText = childNode.getTextContent();
             String nodeName = childNode.getNodeName();
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-
-                switch (nodeName) {
-                    case "class":
-                        // FIXME: make algorithm more reliable without hardcode for xml levels
-                        if (!childNode.getParentNode().getParentNode().getParentNode().getNodeName().equals("layout")) {
-                            folderPath += childNode.getParentNode().getParentNode().getParentNode().getNodeName() + "/";
-                        }
-
-                        if (!childNode.getParentNode().getParentNode().getNodeName().equals("layout")) {
-                            folderPath += childNode.getParentNode().getParentNode().getNodeName() + "/";
-                        }
-
-                        if (!childNode.getParentNode().getNodeName().equals("layout")) {
-                            folderPath += childNode.getParentNode().getNodeName() + "/";
-                        }
-                        folderPath = folderPath.replace("#document/", "");
-                        break;
-
-                }
-
-                pathsToActionsMap.put(nodeText, folderPath);
-                folderPath = "";
-                getPackageName(childNode);
+            if ((childNode.getNodeType() == Node.ELEMENT_NODE) && (nodeName.equals("class"))) {
+                    getParentNodes(childNode);
+                    pathsToActionsMap.put(nodeText, folderPath);
+                    folderPath = "";
             }
+            getPackageName(childNode);
+        }
+    }
+
+    private static void getParentNodes(Node node){
+        while(node!=null){
+            node = node.getParentNode();
+            if(node.getParentNode().getNodeType()==Node.DOCUMENT_NODE){
+               break;
+            }
+            folderPath=node.getNodeName()+"/"+folderPath;
         }
     }
 
