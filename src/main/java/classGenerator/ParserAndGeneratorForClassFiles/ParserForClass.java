@@ -59,10 +59,8 @@ public class ParserForClass extends CommonParseActions {
                                 paramListElement.add("String");
                                 break;
                         }
-
                         // add param-type into array
                         paramList.add(paramListElement);
-
                     }
                     break;
                 case "keyBlockRepeatCount":
