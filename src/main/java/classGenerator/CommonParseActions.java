@@ -17,6 +17,7 @@ import java.util.Properties;
 public abstract class CommonParseActions {
     private static final Logger log = Logger.getLogger(CommonParseActions.class);
 
+    protected static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
     public static String workflowPath = "";
     public static String rootXMLFolder = "";
 
@@ -146,7 +147,7 @@ public abstract class CommonParseActions {
      * update input file for special symbols
      * @throws IOException
      */
-    public static void removeSpecialSymbols() throws IOException {
+    public static void removeSpecialSymbols(String workflowPath) throws IOException {
 
         FileWriter fw = new FileWriter(workflowPath+"_new.xml");
         BufferedWriter WriteFileBuffer = new BufferedWriter(fw);

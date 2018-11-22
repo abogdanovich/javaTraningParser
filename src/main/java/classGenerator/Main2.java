@@ -1,5 +1,7 @@
 package classGenerator;
 
+import classGenerator.ParserAndGeneratorForClassFiles.ParserForClass;
+import classGenerator.ParserAndGeneratorForXmlAndProperties.ParserForXmlAndProperties;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -9,8 +11,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Main {
-    private static final Logger log = Logger.getLogger(Main.class);
+public class Main2 {
+    private static final Logger log = Logger.getLogger(Main2.class);
 
     // change for every feature run
     static final String workflowPath = "PCRF_Other";
@@ -25,8 +27,8 @@ public class Main {
     static final String smpTestPath = "scenarios/SMP/Quality_Gates/Gate4/SMPTests/";
 
     public static void main(String[] args) throws Exception {
-        ClassGenerator classGenerator = new ClassGenerator(workflowPath);
-        XmlAndPropertiesGenerator xmlAndPropertiesGenerator = new XmlAndPropertiesGenerator(workflowPath);
+        ParserForClass classGenerator = new ParserForClass(workflowPath);
+        ParserForXmlAndProperties xmlAndPropertiesGenerator = new ParserForXmlAndProperties(workflowPath);
 
         // leave as 'false' to work with workflow
         boolean buildClass = false;
@@ -50,7 +52,7 @@ public class Main {
                 String line;
                 while ((line = br.readLine()) != null) {
                     log.info("Input XML file is : " + line);
-                    Document xmlActionsDocument = classGenerator.getParserObject(xmlKBFiles + line + ".xml");
+                    Document xmlActionsDocument = classGenerator.getParserObject(workFlowFileName);
                     // recursion node review
                     classGenerator.parseKBActions(xmlActionsDocument);
                 }
@@ -76,8 +78,8 @@ public class Main {
         xmlAndPropertiesGenerator.parseKBWorkflow(xmlWorkFlowDocument);
 
         log.info("generate father PCRF_basic");
-        xmlAndPropertiesGenerator.generateJSystemFatherWorkflow("", workflowPath, xmlAndPropertiesGenerator.fatherXmlOfTestCases);
-        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML("", workflowPath, xmlAndPropertiesGenerator.mapTestScenarioMapTestStepsPropertiesFatherXML);
+        xmlAndPropertiesGenerator.generateJSystemFatherWorkflow();
+        xmlAndPropertiesGenerator.savePropertiesFileForFatherXML();
 
         // copy workflow folders
         Thread.sleep(2000);
