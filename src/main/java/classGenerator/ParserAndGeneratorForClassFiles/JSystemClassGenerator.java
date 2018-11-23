@@ -36,10 +36,8 @@ public class JSystemClassGenerator extends CommonParseActions {
         }
 
         //get folder path path for action
-        folderPath = pathsToActionsMap.get(actionName);
-        if (folderPath == null) {
-            folderPath = "General";
-        }
+        log.debug(actionName);
+        folderPath = pathsToActionsMap.getOrDefault(actionName, "General");
 
         // remove the last "." symbol
         if (!folderPath.equals("")) {
