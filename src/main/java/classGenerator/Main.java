@@ -83,8 +83,8 @@ public class Main {
             // copy workflow folders
             Thread.sleep(2000);
             CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\" + workflowPath, "output\\" + workflowPath + "\\data\\" + workflowPath);
-            Thread.sleep(2000);
-            CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
+//            Thread.sleep(2000);
+//            CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", "output\\" + workflowPath + "\\data\\OCS\\General");
             Thread.sleep(2000);
             CommonParseActions.copyDirectoryWithFilesFromTo("output\\" + workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + workflowPath);
             log.info("Well done!");
