@@ -50,6 +50,7 @@ public class ParserForClass extends CommonParseActions {
 
                         switch (element.getElementsByTagName("paramValueType").item(k).getTextContent()) {
                             case "file":
+                                // import java.io.File;
                                 paramListElement.add("File");
                                 break;
 //                            case "list":

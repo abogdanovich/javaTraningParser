@@ -15,7 +15,7 @@ public class Main {
     private static final Logger log = Logger.getLogger(Main.class);
 
     // change for every feature run
-    static final String workflowPath = "output\\";
+    static final String workflowPath = "PCRF_Basic";
     static final String kbPath = "d:\\KB\\";
     static final String xmlKBFiles = kbPath + "trunk\\SW\\bin\\res\\xml\\";
 
@@ -31,7 +31,7 @@ public class Main {
         ParserForXmlAndProperties xmlAndPropertiesGenerator = new ParserForXmlAndProperties(workflowPath);
 
         // leave as 'false' to work with workflow
-        boolean buildClass = true;
+        boolean buildClass = false;
 
         log.info("Script converter is started");
 
@@ -84,7 +84,7 @@ public class Main {
             Thread.sleep(2000);
             CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\" + workflowPath, "output\\" + workflowPath + "\\data\\" + workflowPath);
             Thread.sleep(2000);
-            //CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
+            CommonParseActions.copyDirectoryWithFilesFromTo(kbPath + "trunk\\tests\\SMP\\OCS\\General", workflowPath + "\\data\\OCS\\General");
             Thread.sleep(2000);
             CommonParseActions.copyDirectoryWithFilesFromTo("output\\" + workflowPath, "C:/JAutomationPackage/Actions/target/classes/" + smpTestPath + workflowPath);
             log.info("Well done!");

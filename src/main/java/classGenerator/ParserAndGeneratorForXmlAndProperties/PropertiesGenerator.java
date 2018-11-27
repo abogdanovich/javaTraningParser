@@ -41,6 +41,8 @@ public class PropertiesGenerator extends CommonParseActions {
                 // rspecial rules should be applied for param values
                 paramValue = paramValue.replace("$${SMP1.Host}", "${sut:R_SMP1/connectDetails/iP}");
                 paramValue = paramValue.replace("$${NE1.Host}", "${sut:R_NE1/connectDetails/iP}");
+                paramValue = paramValue.replace("$${EXTERNAL1.Host}", "${sut:R_EXTERNAL1/connectDetails/iP}");
+
 
                 // variable rule converting
                 if (paramValue.contains("$${")) {
