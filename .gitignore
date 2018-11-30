@@ -9,3 +9,4 @@ smp_actions.txt
 output
 *.iml
 !pom.xml
+!preferences.xml
