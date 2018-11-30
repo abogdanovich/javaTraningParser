@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<layout path="com.allot.QaAutomation">
+	<General>
+	
+                <class tooltip="Add variable in system scope and use it next" >AddVariable</class>
+                <class tooltip="Power On/Off DUT using APC" >ApcController</class>
+                <class tooltip="Calculate and Check a math expression">Calculator</class>
+                <class tooltip="Run a command and check output" obsolete="true">CheckCommandOutput</class>
+                <class tooltip="Run a command and check output + Wait for commant to compelete" obsolete="true" >CheckCommandOutputWithWaitFor</class>
+				<class tooltip="check logs in device/server">CheckLogs</class>
+                <class>CheckMemory</class>
+				<class tooltip="check CPU " obsolete="true" >CheckCPU</class>
+                <class>CheckRegExp</class>
+                <class>CheckTime</class>
+                <class>CheckTimeInterval</class>
+                <class tooltip="Bring Dlink switch ports up/down" >ConfigDlinkSwitch</class>
+                <class>ConfigSwitchPorts</class>
+                <class tooltip="Copy a local file to DUT" >CopyFileToDevice</class>
+                <class tooltip="check ping/telnet/SSH connectivity to DUT" >CreateConnection</class>
+                <class tooltip="Delete a prevoiusly defined variable">DeleteVariable</class>
+                <class obsolete="true">DiffCompare</class>
+                <class>FillHardDisk</class>
+                <class>GetCurrentDate</class>
+                <class tooltip="Perform IP calcuations i.e. increment">IPCalculator</class>
+                <class tooltip="Perform SUM/AVERAGE/MAX/MIN oprerations on list of numbers">ListOperations</class>
+                <class>RegexParser</class>
+                <class obsolete="true">Regsend</class>
+                <class>RunExpectFile</class>
+                <class>ScpFrom</class>
+                <class>ScpTo</class>
+                <class>Scriptlet</class>
+                <class tooltip="Send command to device">SendCommand</class>
+                <class tooltip="Run a local command i.e. cmd /c dir">SendLocalCommand</class>
+                <class>Sleep</class>
+                <class>SleepUntilTime</class>
+                <class>StartCaptureAnalyzer</class>
+                <class>StopCaptureAnalyzer</class>
+                <class obsolete="true">TCP_Replay</class>
+                <class obsolete="true">VariableParser</class>
+                <class>WaitForServiceCatalog</class>
+	</General>
+	<NE>
+		<General>
+ 					    <class>CheckCaptureClassification</class>
+						<class>AnalyzeConnections</class>
+					    <class>AnalyzeTubes</class>
+                        <class tooltip="check No. of connections appear in acstat command">Acstat</class>
+                        <class obsolete="true">Acstat_dpi</class>
+                        <class tooltip="Check active lines/pipes/vcs on device">CheckActiveInstances</class>
+                        <class>CheckBinaryCDR_CC</class>
+                        <class tooltip="Gets Board by type and slot number.">CheckBoardStatus</class>
+                        <class tooltip="Check BW on device/line/pipe/vc level">CheckBW</class>
+                        <class tooltip="Check that device is active">CheckBypassStatus</class>
+                        <class tooltip="Check  CER on device/line/pipe/vc level">CheckCER</class>
+                        <class tooltip="check ping/telnet/connectivity to device">CheckConnectivity</class>
+                        <class tooltip="Check NE license key features">CheckKeyNE</class>
+                        <class tooltip="Check classfication on device/line/pipe/vc level">CheckNoOfConnections</class>
+                        <class obsolete="true">CheckRxdlErrors</class>
+                        <class tooltip="Verify that a given processes are running ...">CheckSystemNE</class>
+                        <class tooltip="Check that a given version/build installed in device">CheckVersionNE</class>
+                        <class>CleanNE</class>
+                        <class>ConfigBdrFilterFile</class>
+                        <class>ConfigureSecurity</class>
+                        <class>ConfigureTimeNE</class>
+                        <class>ConfigureTimeZoneNE</class>
+						<class>CleanZombieConnections</class>
+                        <class tooltip="Fill a HD partition in device">FillDeviceHardDisk</class>
+                        <class>FillDeviceMemory</class>
+                        <class>FreeDeviceHardDisk</class>
+                        <class>FreeDeviceMemory</class>
+                        <class obsolete="true">FUMgrSim</class>
+                        <class>GetActype</class>
+                        <class>GetAllotConfigParam</class>
+                        <class>GetAllotProvisionParam</class>
+                        <class>GetBoards</class>
+                        <class>GetBoardsList</class>
+                        <class tooltip="Run acstat -ix , and get Accept/Drop/Regect connections on device/line/pipe/vc level">GetConnections</class>
+                        <class>GetDeviceHDUsage</class>
+                        <class>GetMemoryUsage</class>
+                        <class>GetMIBValue</class>
+                        <class tooltip="Get and Check Accept/Drop/Regect connections on device/line/pipe/vc level">GetNoOfConnections</class>
+                        <class>GetProcessId</class>
+                        <class>Halt_device</class>
+                        <class>Reboot_device</class>
+                        <class>RxdlClient</class>
+                        <class obsolete="true">SendRootCommand</class>
+                        <class>SetKeyNE</class>
+                        <class tooltip="enable/disable device bypass unit OR bring system to bypass/active" >SetNetworkStatusNE</class>
+                        <class>SNMPHandler</class>
+                        <class tooltip="Download and install specefic NE version/build">UpgradeNE</class>
+						<class obsolete="true" tooltip="for testing/debug use only!">AOS_ParserTester</class>
+		</General>
+		<Policy>
+			<class>AddPipe</class>
+			<class>AddPipeRule</class>
+			<class>AddVC</class>
+			<class>AddVcRule</class>
+			<class>DeletePipe</class>
+			<class>DeletePRule</class>
+			<class>DeleteVC</class>
+			<class>DeleteVcRule</class>
+			<class>UpdateLine</class>
+			<class>UpdatePipe</class>
+			<class>UpdatePipeRule</class>
+			<class>UpdateVC</class>
+			<class>UpdateVcRule</class>
+		</Policy>
+	</NE>
+	<NX>
+		<Catalogs>
+			<common>
+				<class>CheckCatalogExists</class>
+			</common>
+			<Alarm>
+				<class>CheckAlaramsConfiguration</class>
+				<class>AddAlarmActionDefinition</class>
+				<class>RemoveAlarmActionDefinition</class>
+				<class>UpdateAlarmActionDefinition</class>
+				<class>AddAlarm</class>
+				<class>RemoveAlarm</class>
+				<class>UpdateAlarm</class>
+			</Alarm>
+			<AutonomousSystem>
+			<class>AddAutonomousSystemCatalog</class>
+			<class>UpdateAutonomousSystemCatalog</class>
+			<class>DeleteAutonomousSystemCatalog</class>
+			</AutonomousSystem>
+			<DoS>
+				<class>AddDoS_NX</class>
+				<class>DeleteDoS_NX</class>
+				<class>UpdateDoS_NX</class>
+			</DoS>
+			<QoS>
+				<class>AddQoS</class>
+				<class>UpdateQos_NX</class>
+				<class>DeleteQos_NX</class>
+			</QoS>
+			<Host>
+				<class>AddHost_IpAddr_NX</class>
+				<class>AddHost_IPRange_NX</class>
+				<class>AddHost_MACaddr_NX</class>
+				<class>AddHost_Name_NX</class>
+				<class>AddHost_Subnet_NX</class>
+				<class>AddHostGroup_NX</class>
+				<class>AddHostList_NX</class>
+				<class>DeleteHost_NX</class>
+				<class>DeleteHostGroup_NX</class>
+				<class>UpdateHost_IpAddr_NX</class>
+				<class>UpdateHost_IPRange_NX</class>
+				<class>UpdateHost_Ipv6Prefix_NX</class>
+				<class>UpdateHost_Ipv6PrefixRange_NX</class>
+				<class>UpdateHost_MACaddr_NX</class>
+				<class>UpdateHost_Name_NX</class>
+				<class>UpdateHost_Subnet_NX</class>
+				<class>UpdateHostGroup_NX</class>
+				<class>AddCountryClassification_NX</class>
+				<class>DeleteCountryClassification_NX</class>
+				<class>AddHost_Ipv6Prefix_NX</class>
+				<class>AddHost_Ipv6PrefixRange_NX</class>
+				<class>AddDynamicHostWithFile</class>
+			</Host>
+			<HttpHeaderEnrichment>
+				<class>AddHttpHeaderEnrichmentCatalog</class>
+				<class>UpdateHttpHeaderEnrichmentCatalog</class>
+				<class>RemoveHttpHeaderEnrichmentCatalog</class>
+			</HttpHeaderEnrichment>
+			<Service>
+				<class>AddService_NX</class>
+				<class>AddUDSService_NX</class>
+				<class>UpdateUdsService_NX</class>
+				<class>AddServiceGroup_NX</class>
+				<class>DeleteService_NX</class>
+				<class>DeleteServiceGroup_NX</class>
+				<class>UpdateService_NX</class>
+				<class>AddHTTPS_UDS_NX</class>
+				<class>UpdateServiceGroup_NX</class>
+				<class>AddCodecServices_NX</class>
+				<class>RemoveServicesPorts_NX</class>
+				<class>AddServicesToPolicy_NX</class>
+			</Service>
+			<ServicePlan>
+				<class>AddServicePlan_NX</class>
+				<class>UpdateServicePlan_NX</class>
+				<class>DeleteServicePlan_NX</class>
+				<class>AddServicePlanMulti</class>
+			</ServicePlan>
+			<ServicePlanAddOn>
+				<class>AddServicePlanAddOn_NX</class>
+				<class>DeleteServicePlanAddOn_NX</class>
+			</ServicePlanAddOn>
+			<Time>
+				<class>AddTimeAnnualy_NX</class>
+				<class>AddTimeDaily_NX</class>
+				<class>AddTimeMonthly_NX</class>
+				<class>AddTimeWeekly_NX</class>
+				<class>DeleteTime_NX</class>
+				<class>UpdateTimeAnnualy_NX</class>
+				<class>UpdateTimeDaily_NX</class>
+				<class>UpdateTimeMonthly_NX</class>
+				<class>UpdateTimeWeekly_NX</class>
+			</Time>
+			<Tos>
+				<class>AddToS_NX</class>
+				<class>DeleteToS_NX</class>
+				<class>UpdateToS_NX</class>
+			</Tos>
+			<Vlan>
+				<class>AddVLAN_NX</class>
+				<class>DeleteVLAN_NX</class>
+				<class>UpdateVLAN_NX</class>
+				<VlanGroup>
+					<class>AddVlanGroup</class>
+					<class>RemoveVlanGroup</class>
+					<class>UpdateVlanGroup</class>
+				</VlanGroup>
+				<VlanRedirection>
+					<class>AddVlanRedirection</class>
+					<class>UpdateVlanRedirection</class>
+					<class>RemoveVlanRedirection</class>
+				</VlanRedirection>
+			</Vlan>
+			<Encapsulation>
+				<class>AddGre_NX</class>
+				<class>AddGreGroup_NX</class>
+				<class>DeleteGre_NX</class>
+				<class>DeleteGreGroup_NX</class>
+				<class>UpdateGre_NX</class>
+			</Encapsulation>
+			<Interface>
+				<class>AddIFC_Port_NX</class>
+				<class>AddIFC_Group_NX</class>
+				<class>DeleteIFC_Port_NX</class>
+				<class>DeleteIFC_Group_NX</class>
+			</Interface>
+			<ChargingApplication>
+				<class>AddChargingApplication_NX</class>
+				<class>DeleteChargingApplication_NX</class>
+			</ChargingApplication>
+			<ChargingPlan>
+				<class>AddChargingPlan_NX</class>
+				<class>DeleteChargingPlan_NX</class>
+			</ChargingPlan>
+			<ServiceActivation>
+				<class>AddCaptivePortal_NX</class>
+				<class>UpdateCaptivePortal_NX</class>
+				<class>DeleteCaptivePortal_NX</class>
+				<class>AddIntgService</class>
+				<class>UpdateIntgService</class>
+				<class>DeleteIntgService</class>
+				<class>AddIntgServiceChain</class>
+				<class>AddIntgServiceGroup</class>
+				<class>UpdateIntgServiceChain</class>
+				<class>DeleteIntgServiceChain</class>
+				<class>AddLocalService</class>
+				<class>AddLocalServiceMulti</class>
+				<class>DeleteLocalService</class>
+			</ServiceActivation>
+			<Quota>
+				<class>AddQuota_NX</class>
+				<class>UpdateQuota_NX</class>
+				<class>DeleteQuota_NX</class>
+			</Quota>
+			<MobileDevice>
+				<class>MobileDevice_NX</class>
+			</MobileDevice>
+		</Catalogs>
+		<General>
+		    <class>BuildSetupFromFile</class> 
+		    <class>ASRA</class>  
+			<class>DeviceConfiguration_NXCLI</class>
+			<class>AddDeviceToNX</class>
+			<class>NXServerDistributePolicy</class>
+			<!-- <class>ConnectNX</class> -->
+			<class>DeleteDevice_NX</class>
+			<class>GetDataFromNXDB</class>
+			<class>GetNXDBParam</class>
+			<class>ImportDevice_NX</class>
+			<class>SendCommandsFile</class>
+			<class>SendCommandsNXFile</class>
+			<class>NXServerWebUpdate</class>
+			<class>DeviceWebUpdate</class>
+			<class>ConfigWebSafe</class>
+			<class>DistributeWebSafeFiles</class>
+			<class>DeviceWebUpdateRollback</class>
+			<class>NXServerWebUpdateRollback</class>
+            <class tooltip="check APU version in device + CCs">CheckDeviceApuVersion</class>
+			<class>CheckNewServices</class>
+			<class>NetAwarenessConfig</class>
+			<class>SetKeyNX</class>
+			<class>RebootNX</class>
+			<class>UpgradeNX</class>
+			<class>GetAlarmsAndEvents</class>
+			<class>GetQuotaEvents</class>
+			<class>DeviceConfiguration</class>
+			<class>ConfigNetAccounting</class>
+		</General>
+		<Monitoring>
+			<class>AutoSystemMonitoring</class>
+			<class>HostMonitoringStatistics</class>
+			<class>VoIPMinutesOfUseStatistics</class>
+			<class>CompareReport</class>
+			<class>RunReport</class>
+			<class>MonitoringHandler</class>
+			<class>ServicePlanPopularity</class>
+			<class>TubeStatistics</class>
+			<class>CellMonitoring</class>
+			<class>WebSafeTrafficMonitoring</class>
+			<class>MostActiveTubes</class>
+			<class>ServicePlanQuotaPopularityAnalysis</class>
+			<class>ServicePlanQuotaVolumeAnalysis</class>
+			<class>ServicePlanQuotaUsageAnalysis</class>			
+		</Monitoring>
+		<Policy>
+			<class>AddLine_NX</class>
+			<class>AddPipe_NX</class>
+			<class>AddVC_NX</class>
+			<class>DeleteLine_NX</class>
+			<class>DeletePipe_NX</class>
+			<class>DeleteVC_NX</class>
+			<class>UpdateLine_NX</class>
+			<class>UpdatePipe_NX</class>
+			<class>UpdateVC_NX</class>
+			<class>DistributePolicyNX</class>
+			<class>CheckTube</class>
+			<class>AddOnlineChargingRule</class>
+			<class>AddOfflineChargingRule</class>
+			<class>UpdateOnlineChargingRule</class>
+			<class>UpdateOfflineChargingRule</class>
+			<class>DeleteOnlineChargingRule</class>
+			<class>DeleteOfflineChargingRule</class>
+			<class>AssignPolicyAlarm</class>
+			<class>UpdatePolicyAlarm</class>
+			<class>DeletePolicyAlarm</class>
+			<class>ConfigTetheringPolicy</class>
+			<class>AddPolicy</class>
+		</Policy>
+	</NX>
+	<SMP>
+		<Configuration>
+		    <class>ChangeSMPMode</class>
+			<class>ConfigSMPFiles</class>			
+			<class>ConfigSMPGeneral</class>
+			<class>ConfigSMPPolicyAndCharging</class>
+			<class>ConfigSMPSessionParam</class>
+			<class>ConfigSMPBilling</class>
+			<class>AddSMP</class>
+			<class>DeleteSMP</class>
+			<class>AddSMPGroup</class>
+			<class>DeleteSMPGroup</class>
+			<class>UpgradeSMP</class>
+			<class>CheckSMPSessionParam</class>
+			<class>AddSMPDomain</class>
+			<class>DeleteSMPDomain</class>
+			<class>ConfigDhcpFile</class>			
+		</Configuration>
+		<General>
+		    <class>RunRadiusClient</class>
+			<class>RunPCRFServer</class>
+			<class>RunOCSServer</class>
+			<class>RunSDServer</class>
+			<class>RunSdWorker</class>
+			<class>GetRadiusCounter</class>
+			<class>GetPCRFCounter</class>
+			<class>GetOCSCounter</class>
+			<class>GetSdCounter</class>
+			<class>StopApplication</class>
+			<class tooltip="Check subsribers classifcation /paramters on device">CheckSubSessions</class>
+			<class tooltip="Check subsribers classifcation /paramters on device">CheckActiveSubs</class>
+			<class tooltip="Check subsribers classifcation /paramters on device">AnalyzeSubsribers</class>
+			<class tooltip="Check delta time between 2 successvie CCR/CCA/RAR/RAA messages content created/recieved by PCRF/OCS/SD server">CheckSubMessagesTime</class>
+			<class tooltip="Check CCR/CCA/RAR/RAA messages content created/recieved by PCRF/OCS/SD server">CheckSubMessages</class>
+			<class>CheckSubCDR</class>
+			<class>CheckRegisteredSubs</class>
+			<class>RebootSMP</class>
+			<class>FetchAvailableCells</class>
+			<class>UploadCellMapping</class>
+			<class>CheckSubMapping</class>	
+		</General>
+		<Datamediation>
+			<class>CheckBinaryCDR_DM</class>
+		</Datamediation>
+	 </SMP>
+	<MediationDevice>
+	<class>AddMediationDevice</class>
+	<class>DeleteMediationDevice</class>
+	</MediationDevice>
+	<SOAP>
+		<NX>
+			<class tooltip="activate NX SOAP method">activateSubscriber</class>
+			<class tooltip="activate NX SOAP method">addSubscribers</class>
+			<class tooltip="activate NX SOAP method">boostSubscribersServicePlan</class>
+			<class tooltip="activate NX SOAP method">boostSubscriberTimeQuota</class>
+			<class tooltip="activate NX SOAP method">boostSubscriberVolumeQuota</class>
+			<class tooltip="activate NX SOAP method">getCountLoggedInSubscribersByCurrentServicePlan</class>
+			<class tooltip="activate NX SOAP method">getCountLoggedInSubscribersByProvisionedServicePlan</class>
+			<class tooltip="activate NX SOAP method">getDetailedSubscriberStatus</class>
+			<class tooltip="activate NX SOAP method">getExtIdByIp</class>
+			<class tooltip="activate NX SOAP method">getLoggedInSubscribersCount</class>
+			<class tooltip="activate NX SOAP method">getRegisteredSubscribersByCurrentSPCount</class>
+			<class tooltip="activate NX SOAP method">getRegisteredSubscribersByProvisionedSPCount</class>
+			<class tooltip="activate NX SOAP method">getRegisteredSubscribersCount</class>
+			<class tooltip="activate NX SOAP method">getServicePlanList</class>
+			<class tooltip="activate NX SOAP method">getSubscriber</class>
+			<class tooltip="activate NX SOAP method">getSubscriberQuotaUsage</class>
+			<class tooltip="activate NX SOAP method">modifySubscriber</class>
+			<class tooltip="activate NX SOAP method">modifySubscriberService</class>
+			<class tooltip="activate NX SOAP method">modifySubscriberServiceByIP</class>
+			<class tooltip="activate NX SOAP method">ModifySubscriberBc</class>
+			<class tooltip="activate NX SOAP method">ModifySubscriberServiceBc</class>
+			<class tooltip="activate NX SOAP method">ModifySubscriberServiceByIPBc</class>
+			<class tooltip="activate NX SOAP method">quarantineSubscriber</class>
+			<class tooltip="activate NX SOAP method">removeSubscriber</class>
+			<class tooltip="activate NX SOAP method">resetSubscriberQuota</class>
+			<class tooltip="activate NX SOAP method">suspendSubscriber</class>
+			<class tooltip="activate NX SOAP method">unQuarantineSubscriber</class>
+		</NX>
+		<SMP>
+			<class tooltip="activate SMP SOAP method">SMP_activateSubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_addSubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_addSubscribers</class>
+			<class tooltip="activate SMP SOAP method">SMP_boostSubscribersServicePlan</class>
+			<class tooltip="activate SMP SOAP method">SMP_boostSubscribersTimeQuota</class>
+			<class tooltip="activate SMP SOAP method">SMP_boostSubscribersVolumeQuota</class>
+			<class tooltip="activate SMP SOAP method">SMP_getCountLoggedInSubscribers</class>
+			<class tooltip="activate SMP SOAP method">SMP_getCountLoggedInSubscribersByCurrentServicePlan</class>
+			<class tooltip="activate SMP SOAP method">SMP_getCountLoggedInSubscribersByProvisionedServicePlan</class>
+			<class tooltip="activate SMP SOAP method">SMP_getCountRegisteredSubscribers</class>
+			<class tooltip="activate SMP SOAP method">SMP_getCountRegisteredSubscribersByCurrentServicePlan</class>
+			<class tooltip="activate SMP SOAP method">SMP_getCountRegisteredSubscribersByProvisionedServicePlan</class>
+			<class tooltip="activate SMP SOAP method">SMP_getExternalIdByIP</class>
+			<class tooltip="activate SMP SOAP method">SMP_getExtIDByNetworkAddress</class>
+			<class tooltip="activate SMP SOAP method">SMP_getSubscriberNameInfoByIP</class>
+            <class tooltip="activate SMP SOAP method">SMP_getSubscriberNameInfoByNetworkAddress</class>
+			<class tooltip="activate SMP SOAP method">SMP_getSubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_getSubscriberData</class>
+			<class tooltip="activate SMP SOAP method">SMP_getSubscriberIpsList</class>
+			<class tooltip="activate SMP SOAP method">SMP_getSubscriberQuotaUsage</class>
+			<class tooltip="activate SMP SOAP method">SMP_modifySubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_modifySubscriberService</class>
+			<class tooltip="activate SMP SOAP method">SMP_modifySubscriberServiceByIP</class>
+			<class tooltip="activate SMP SOAP method">SMP_modifySubscribersService</class>
+			<class tooltip="activate SMP SOAP method">SMP_modifySubscriberBc</class>
+			<class tooltip="activate SMP SOAP method">SMP_modifySubscriberServiceByIPBc</class>
+			<class tooltip="activate SMP SOAP method">SMP_modifySubscribersServiceBc</class>
+			<class tooltip="activate SMP SOAP method">SMP_quarantineSubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_removeSubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_removeSubscribers</class>
+			<class tooltip="activate SMP SOAP method">SMP_resetSubscriberQuota</class>
+			<class tooltip="activate SMP SOAP method">SMP_startSubscriberService</class>
+			<class tooltip="activate SMP SOAP method">SMP_stopSubscriberService</class>
+			<class tooltip="activate SMP SOAP method">SMP_startSubscriberService_fromCSV</class>
+            <class tooltip="activate SMP SOAP method">SMP_stopSubscriberService_fromCSV</class>
+			<class tooltip="activate SMP SOAP method">SMP_suspendSubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_suspendSubscribers</class>
+			<class tooltip="activate SMP SOAP method">SMP_unQuarantineSubscriber</class>
+			<class tooltip="activate SMP SOAP method">SMP_searchSubscribers</class>
+			<class tooltip="activate SMP SOAP method">SMP_searchSubscribersByPrefixName</class>
+			<class tooltip="activate SMP SOAP method">SMP_searchSubscribersByServicePlanId</class>
+		</SMP>
+	</SOAP>
+	<Spirent>
+		<class tooltip="Check CSV files created after running Spirent traffic"  >CompareSpirentResults</class>
+		<class tooltip="Check if there is pcket drop in teh CSV files created after running Spirent traffic" obsolete="true">CompareSpirentTrafficLoss</class>
+		<!--<class>ConnectSpirent</class> -->
+		<class tooltip="Collect statistics from CSV files created by Spirent for future use by other spirent KBs ">GetSpirentResults</class>
+		<class obsolete="true">RunProfYTraffic</class>
+		<class obsolete="true">RunRfc2544</class>
+		<class  tooltip="Run Spirent TCL file created by sequencer" >RunSpirentTraffic</class>
+		<class  obsolete="true">GetCurrentSpirentRecord</class>
+		<class tooltip="Update specific varibale insider TCL spirent file">UpdateSpirentTCLFile</class>
+		<driver>
+			<class tooltip="Define Spirent traffic streams and allocate ports ">InitSpirentTrafficGenerator</class>
+			<class tooltip="Start Spirent traffic for perviously created scenario in InitSpirentTrafficGenerator KB">StartSpirentTrafficGenerator</class>
+			<class tooltip="Stop Spirent traffic for perviously started scenario">StopSpirentTrafficGenerator</class>
+			<class tooltip="Update already created/ruuning Spirent traffic">UpdateSpirentTrafficGenerator</class>
+			<class tooltip="Collect and compare counters from active Spirent traffic streams">StatisticsSpirentTrafficGenerator</class>
+		</driver>
+	</Spirent>
+	<Avalanche>
+		<class>InitAvalanche</class>
+		<class>StartAvalanche</class>
+		<class>StopAvalanche</class>
+		<class>CompareAvalancheResults</class>
+		<class>AnalyzeCapture</class>
+		<class>CopyResultDirectory</class>
+		<class>CheckAvalancheServerSummary</class>
+	</Avalanche>
+	<IXIA>
+		<class tooltip="Ixia traffic generator KB"  obsolete="true">InitIxiaTraffic</class>
+		<class tooltip="Ixia traffic generator KB"  obsolete="true">StartIxiaTraffic</class>
+		<class tooltip="Ixia traffic generator KB"  obsolete="true">StopIxiaTraffic</class>
+		<class tooltip="Ixia traffic generator KB"  obsolete="true">CompareIxiaStatistics</class>
+	</IXIA>
+</layout>

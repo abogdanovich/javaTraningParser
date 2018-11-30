@@ -76,8 +76,6 @@ public class PropertiesGenerator extends CommonParseActions {
         }
     }
 
-
-
     /**
      * save properties for checkboxes
      * @param filePath
@@ -120,6 +118,25 @@ public class PropertiesGenerator extends CommonParseActions {
                 WriteFileBuffer.write(String.format("%s.list=%s\n", uuid, loopData.get(1)));
                 WriteFileBuffer.write(String.format("%s.loop\\ value=%s\n", uuid, loopData.get(0)));
                 WriteFileBuffer.write(String.format("%s.jsystem.uisettings=sortSection\\:0;sortHeader\\:0;paramsOrder\\:defaultOrder;activeTab\\:0;headersRatio\\:0.1,0.25,0.05,0.2\n", uuid));
+            }
+
+            WriteFileBuffer.close();
+        } finally {
+            log.info(String.format("Properties file [%s] is updated", fileName));
+        }
+    }
+
+    public void savePropertiesFileWithDataDriven(String filePath, String fileName, UUID uuid, ArrayList<String> dataDrivenData) throws IOException {
+        try {
+            filePath = rootXMLFolder + "\\" + filePath;
+            checkDirectoryExists(filePath);
+
+            BufferedWriter WriteFileBuffer = new BufferedWriter(new FileWriter(filePath+fileName, true));
+            // write specific configuration line
+
+            if (!dataDrivenData.isEmpty()) {
+                WriteFileBuffer.write(String.format("%s.File=%s\n", uuid, dataDrivenData.get(0)));
+                WriteFileBuffer.write(String.format("%s.Parameter=%s\n", uuid, dataDrivenData.get(1)));
             }
 
             WriteFileBuffer.close();
